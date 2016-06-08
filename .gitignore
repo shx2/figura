@@ -1,3 +1,6 @@
 *.pyc
 __pycache__
 docs/_build
+dist
+build
+figura.egg-info/

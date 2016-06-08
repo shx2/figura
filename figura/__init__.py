@@ -1,7 +1,7 @@
 """
 A python package for parsing and working with `Figura <index.html>`_ config files.
 
-This library also includes an executable script ``bin/figura_print.py``, for processing
+This library also includes an executable script ``figura/tools/figura_print.py``, for processing
 your figura config files and generating your configuration, printing it as a JSON structure.
 The generated JSON-structured configuration can then be read by programs written in
 any other language (using its JSON parser).
