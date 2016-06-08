@@ -17,9 +17,9 @@ def read_config(path):
     
     The path can point to:
     
-    - a config file. E.g. ``figura.unittests.config.basic1``
-    - a config directory. E.g. ``figura.unittests.config``
-    - a value (or section) inside a config. E.g. ``figura.unittests.config.basic1.some_params.a``
+    - a config file. E.g. ``figura.tests.config.basic1``
+    - a config directory. E.g. ``figura.tests.config``
+    - a value (or section) inside a config. E.g. ``figura.tests.config.basic1.some_params.a``
     
     :param path: a string or a `FiguraPath <#figura.path.FiguraPath>`_.
     :return: a `ConfigContainer <#figura.container.ConfigContainer>`_.
@@ -30,11 +30,11 @@ def read_config(path):
 
         from figura.utils import read_config
         
-    >>> read_config('figura.unittests.config.basic1').some_params.a  # read a config file
+    >>> read_config('figura.tests.config.basic1').some_params.a  # read a config file
     1
-    >>> read_config('figura.unittests.config.basic1.some_params.a')  # read a value inside a config file
+    >>> read_config('figura.tests.config.basic1.some_params.a')  # read a value inside a config file
     1
-    >>> read_config('figura.unittests.config').basic1.some_params.a  # read a directory of config files
+    >>> read_config('figura.tests.config').basic1.some_params.a  # read a directory of config files
     1
     """
     

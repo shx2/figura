@@ -11,7 +11,7 @@ from figura import read_config, ConfigContainer
 
 ################################################################################
 
-UNITTEST_FILE_PATH_PREFIX = 'figura.unittests.config.'
+UNITTEST_FILE_PATH_PREFIX = 'figura.tests.config.'
 
 ################################################################################
 
@@ -86,10 +86,8 @@ class BasicTest(unittest.TestCase):
     
     def test_basic1(self):
         return self.run_self_contained('basic1')
-
     def test_overlay(self):
         return self.run_self_contained('overlay')
-    
     def test_override(self):
         return self.run_self_contained('override')
     

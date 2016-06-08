@@ -4,7 +4,7 @@ Definition of the config-container type.
 
 import json
 
-from .misc import Struct, deep_getattr, deep_setattr
+from .misc import Struct, merge_dicts, deep_getattr, deep_setattr
 
 
 ################################################################################
@@ -123,8 +123,6 @@ class ConfigContainerMixin():
 class ConfigContainer(Struct, ConfigContainerMixin):
     """
     A `Struct <#figura.misc.Struct>`_-like (recursive) container holding the configuration data.
-    
-    .. _Struct:
     """
     
     DEFAULT_METADATA = Struct(
@@ -139,7 +137,7 @@ class ConfigContainer(Struct, ConfigContainerMixin):
         super(ConfigContainer, self).__init__(*args, **kwargs)
         # not doing self._metadata=x because that results with self['_metadata']=x,
         # i.e. adding a new key to the container
-        self.__dict__['_metadata'] = Struct(metadata)
+        self.__dict__['_metadata'] = Struct(merge_dicts(self.DEFAULT_METADATA, metadata))
         
     def get_metadata(self):
         return self._metadata

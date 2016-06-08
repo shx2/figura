@@ -40,7 +40,7 @@ class ConfigParser(object):
     
         from figura.parser import ConfigParser
         parser = ConfigParser()
-        config = parser.parse('figura.unittests.config.basic1')
+        config = parser.parse('figura.tests.config.basic1')
         
     """
     
@@ -60,7 +60,7 @@ class ConfigParser(object):
     def parse(self, path):
         """
         Parse a figura config file, identified by its import path, E.g.
-        ``figura.unittests.config.basic1``.
+        ``figura.tests.config.basic1``.
         
         :return: a `ConfigContainer <#figura.container.ConfigContainer>`_ object.
         :raise ConfigParsingError: if parsing fails.
@@ -98,7 +98,7 @@ class ConfigParser(object):
         if type(x) == type(inspect):
             # the top-level module object --> a ConfigContainer
             raw_attrs = self._get_dunder_dict(x)
-        elif inspect.isclass(x):
+        elif _is_raw_container(x):
             # a class --> a ConfigContainer
             mro_dicts = [
                 self._get_dunder_dict(t)
@@ -109,8 +109,7 @@ class ConfigParser(object):
             # handle auto-overlay magic
             if nesting_context is None:
                 nesting_context = []
-            nesting_context = list(nesting_context)  # modifying it, so make a copy
-            nesting_context.append(( name, x ))
+            nesting_context = nesting_context + [( name, x )]  # don't use append
             for overlayee in self._gen_overlayees(nesting_context):
                 for k, v in self._get_dunder_dict(overlayee).items():
                     if k not in raw_attrs:
@@ -141,11 +140,20 @@ class ConfigParser(object):
         
         return container
 
-    def _get_dunder_dict(self, x):
+    def _get_dunder_dict(self, x, deep = True):
         if x == object:
             # result of the mro call:
             return {}
-        d = dict(x.__dict__)
+        objs = [ x ]
+        if deep:
+            try:
+                objs.extend(inspect.getmro(x)[1:])
+            except AttributeError:
+                pass
+            dicts = [ self._get_dunder_dict(obj, deep = False) for obj in objs ]
+        else:
+            dicts = [ dict(x.__dict__) ]
+        d = merge_dicts(*reversed(dicts))
         return d
     
     def _prepare_attrs(self, raw_attrs):
@@ -194,7 +202,11 @@ class ConfigParser(object):
                         attr_path = '.'.join(rel_path)
                         overlayee, opaque = \
                             self._deep_getattr_with_opaqueness_check(nester_base, attr_path)
-                        yield overlayee
+                        # make sure the overlayee is a raw container, because it should
+                        # be possible to override any (primitive) value with a container,
+                        # in which case, no overlaying takes place.
+                        if _is_raw_container(overlayee):
+                            yield overlayee
                         # discontinue overlay chain if __opaque__ is set somehere
                         # in nester_base's path
                         if opaque:
@@ -222,6 +234,11 @@ class ConfigParser(object):
     
 
 ################################################################################
+
+def _is_raw_container(x):
+    # a raw container is the 'class x: ...' container as appears in the figura file, before
+    # converting it to a ConfigContainer
+    return inspect.isclass(x)
 
 def _is_marked_opaque(x):
     return getattr(x, '__opaque__', False)

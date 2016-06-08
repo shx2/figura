@@ -2,12 +2,14 @@
 """
 Read a Figura config file, and print the config in JSON format.
 
-Usage:
+Usage
+------
 
-By "python-import" path
-% python figura_print.py figura.unittests.config.basic1.some_params --override a=a_new_value
+By "python-import" path::
+    
+    % python figura_print.py figura.tests.config.basic1.some_params --override a=a_new_value
 
-By file path: NOT SUPPORTED CURRENTLY!
+By file path: not support currently.
 
 """
 

@@ -47,6 +47,13 @@ class test_opaque_levels2:
     class verify:
         entry_point = 'A7_result'
 
+class test_derived_overlyee:
+    is_unittest = True
+    class construct:
+        entry_point = 'A8'
+    class verify:
+        entry_point = 'A8_result'
+
 ################################################################
 # Unittest data
 
@@ -168,5 +175,27 @@ class A7_result:
             z = 9999
             c3 = 777
             c4 = 888
+
+###############
+# test when the overlayee (A8_base.C) is derived from another config (C2)
+
+class C2:
+    c1 = 5
+    c2 = 6
+
+class A8_base:
+    class C(C2):
+        c3 = 777
+
+class A8(A8_base):
+    class C:
+        c4 = 888
+    
+class A8_result:
+    class C:
+        c1 = 5
+        c2 = 6
+        c3 = 777
+        c4 = 888
 
 ###############

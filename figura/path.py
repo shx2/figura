@@ -10,14 +10,14 @@ class FiguraPath(object):
     """
     A path to a Figura config file, or a value within one.
     The path contains two (optional) parts: the file-path, which is a python-import
-    path (e.g. figura.unittests), and a (deep) attribute-path to point to a specific
+    path (e.g. figura.tests), and a (deep) attribute-path to point to a specific
     value inside the file.
     
     The two parts are concatenated together with the same delimiter used by each
     of the parts, thus one cannot immediately tell
     
-    E.g.: a path representing "the value of ``A.B.b`` inside the config file ``figura.unittests.config.override``,
-    is written like: ``figura.unittests.config.override.A.B.b``.
+    E.g.: a path representing "the value of ``A.B.b`` inside the config file ``figura.tests.config.override``,
+    is written like: ``figura.tests.config.override.A.B.b``.
     """
     
     DELIM = '.'
@@ -40,7 +40,7 @@ class FiguraPath(object):
         """
         Construct a FiguraPath object from its two parts.
         
-        :param file_path: a python import-path. E.g. ``figura.unittests.config.override``
+        :param file_path: a python import-path. E.g. ``figura.tests.config.override``
         :param attr_path: a (deep) attribute inside the file. E.g. ``A.B.b``
         """
         path_str = cls.DELIM.join([ part for part in (file_path, attr_path) if part ])

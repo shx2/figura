@@ -15,6 +15,7 @@ configurations and overrides into single ConfigContainer.
 """
 
 from .container import ConfigContainer
+from .override import ConfigOverrideSet
 from .errors import ConfigError, ConfigParsingError, ConfigValueError
 
 from .utils import read_config, build_config

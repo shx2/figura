@@ -9,6 +9,18 @@ from .misc import deep_getattr, deep_setattr
     
 ################################################################################
 
+class ConfigOverrideSet(ConfigContainer):
+    """
+    A ConfigContainer representing an override-set, which can be applied to
+    other config containers.
+    """
+    
+    def __init__(self, *args, **kwargs):
+        super(ConfigOverrideSet, self).__init__(*args, **kwargs)
+        self.get_metadata().is_override_set = True
+
+################################################################################
+
 def apply_overrides_to_config(container, overrides, callback_key_prefix = '', enforce_override_set = True, **kwargs):
     """
     Apply overrides from an override-set to a container (in-place).

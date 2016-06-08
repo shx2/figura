@@ -16,13 +16,13 @@ Example::
     parser.add_argument('config', nargs = 1)
     add_override_argument(parser)
     # parse some arguments:
-    args = parser.parse_args(['--override', 'x=somevalue', 'figura.unittests.config.basic1'])
+    args = parser.parse_args(['--override', 'x=somevalue', 'figura.tests.config.basic1'])
     # read the config and apply the overrides to it:
     config = read_config(args.config[0])
     config.apply_overrides(args.override)
     print(config)
     
-Another example, leveraging `build_config <#figura.cli.build_config_from_cli>`_.
+Another example, leveraging `build_config <#figura.cli.build_config_from_cli>`__::
 
     import argparse
     from figura import read_config
@@ -30,7 +30,7 @@ Another example, leveraging `build_config <#figura.cli.build_config_from_cli>`_.
     # create the parser object:
     parser = argparse.ArgumentParser()
     # define cli arguments for specifying config file and overrides to apply to it:
-    default_config = 'figura.unittests.config.basic1'
+    default_config = 'figura.tests.config.basic1'
     parser.add_argument('config', nargs = '*')  # 0 or more configs
     add_override_argument(parser)
     # parse some arguments:
@@ -64,9 +64,9 @@ def add_override_argument(parser, *names, **kwargs):
         (e.g. boolify_).
     
     :param parser: an ArgumentParser object.
-    :param names: The `names` args to be passed on to _`parser.add_argument`.
+    :param names: The `names` args to be passed on to `parser.add_argument`.
         Defaults to `DEFAULT_OVERRIDE_OPTION_NAMES`.
-    :param kwargs: Extra kwargs to pass on to _`parser.add_argument`.
+    :param kwargs: Extra kwargs to pass on to `parser.add_argument`.
         Supported kw arguments: dest, required, help.
 
     .. _boolify:
