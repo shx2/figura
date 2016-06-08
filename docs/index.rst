@@ -15,13 +15,14 @@ For an easy start, check out the `Basic Guide <guide.html>`_ and `Tutorial <tuto
 
 Also refer to the documentation of the `figura python package <figura.html>`_.
 
+Other locations:
+
+- `Figura's GitHub page <https://github.com/shx2/figura>`_
+- `Figura on PyPI <https://pypi.python.org/pypi?:action=display&name=figura>`_
+
 
 .. toctree::
    :maxdepth: 1
-
-    Basic guide to figura <guide.rst>
-    Figura Tutorial <tutorial.rst>
-    The figura python package <figura.rst>
 
 
 
