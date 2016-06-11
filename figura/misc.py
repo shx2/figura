@@ -79,28 +79,44 @@ class Struct(dict):
 ################################################################################
 # attribute access tricks
 
-def deep_getattr(x, attr_path, *args):
+def deep_getattr(x, attr_path, *args, **kwargs):
     """
     ``deep_getattr(x, 'a.b.c')`` -->
     ``getattr(getattr(getattr(x, 'a'), 'b'), 'c')``
     """
-    return _deep_attr_operator(getattr, x, attr_path, *args)
+    try:
+        return _deep_attr_operator(getattr, x, attr_path, *args, **kwargs)
+    except AttributeError:
+        # if a default value is provided, return it
+        if args:
+            default_value, = args
+            return default_value
+        raise
 
-def deep_setattr(x, attr_path, value):
+def deep_setattr(x, attr_path, value, **kwargs):
     """
     ``deep_setattr(x, 'a.b.c', y)`` -->
     ``setattr(getattr(getattr(x, 'a'), 'b'), 'c', y)``
     """
-    return _deep_attr_operator(setattr, x, attr_path, value)
+    return _deep_attr_operator(setattr, x, attr_path, value, **kwargs)
 
-def _deep_attr_operator(func, x, attr_path, *args):
+def _deep_attr_operator(func, x, attr_path, *args, **kwargs):
+    auto_constructor = kwargs.pop('auto_constructor', None)
+    assert not kwargs, kwargs
     while True:
         attr, delim, rest = attr_path.partition('.')
         if not delim:
             # deepest level -- apply func:
             return func(x, attr_path, *args)
         # go one level deeper:
-        x = getattr(x, attr)
+        try:
+            x = getattr(x, attr)
+        except AttributeError:
+            if auto_constructor is not None:
+                setattr(x, attr, auto_constructor())
+                x = getattr(x, attr)
+            else:
+                raise
         attr_path = rest
 
 ################################################################################

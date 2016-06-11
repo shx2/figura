@@ -97,7 +97,7 @@ class ConfigContainerMixin():
         """
         deep-conversion of a dict to a ConfigContainer
         """
-        return get_config_container_from_dict(x)
+        return get_config_container_from_dict(x, cls = cls)
 
     def to_python_string(self):
         """
@@ -145,17 +145,17 @@ class ConfigContainer(Struct, ConfigContainerMixin):
 
 ################################################################################
 
-def get_config_container_from_dict(x):
+def get_config_container_from_dict(x, cls = ConfigContainer):
     """
     Deep-conversion of a dict to a ConfigContainer.
     """
     if isinstance(x, dict):
         # convert recursively, and preserve dict type
         y = type(x)(
-            ( k, get_config_container_from_dict(v) )
+            ( k, get_config_container_from_dict(v, cls = cls) )
             for k, v in x.items()
         )
-        return ConfigContainer(y)
+        return cls(y)
     else:
         # assume an atomic value
         return x

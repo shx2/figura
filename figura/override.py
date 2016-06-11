@@ -44,26 +44,23 @@ def apply_overrides_to_config(container, overrides, callback_key_prefix = '', en
 
         # check if overlaying -- i.e. if value is a nested container, which isn't
         # marked as opaque.
-        if isinstance(value, ConfigContainer) and not value.get_metadata().is_opaque_override:
-            # value is a container -- potential nested override
-            nested_container = container.setdefault(key, ConfigContainer())
-            if isinstance(nested_container, ConfigContainer):
-                # nested override, apply recursively
-                cur_key_prefix = '%s.' % ( normailze_override_key(key), )
-                if callback_key_prefix:
-                    cur_key_prefix = '%s.%s' % ( callback_key_prefix, cur_key_prefix )
-                apply_overrides_to_config(
-                    nested_container, value,
-                    callback_key_prefix = cur_key_prefix,
-                    enforce_override_set = enforce_override_set,
-                    **kwargs
-                )
-                applied = True
-            else:
-                # not really a nested override, because the value being overridden is
-                # not a container. Therefore, not treated as an overlay. We just
-                # overwrite it (below).
-                pass
+        old_value = container.get(key)
+        if (isinstance(old_value, ConfigContainer) and
+            isinstance(value, ConfigContainer) and
+            not value.get_metadata().is_opaque_override):
+            
+            # old_value and value are both containers -- a nested override, apply recursively
+            nested_container = container[key]
+            cur_key_prefix = '%s.' % ( normalize_override_key(key), )
+            if callback_key_prefix:
+                cur_key_prefix = '%s.%s' % ( callback_key_prefix, cur_key_prefix )
+            apply_overrides_to_config(
+                nested_container, value,
+                callback_key_prefix = cur_key_prefix,
+                enforce_override_set = enforce_override_set,
+                **kwargs
+            )
+            applied = True
 
         if not applied:
             # flat or plain override
@@ -95,20 +92,20 @@ def apply_override(
         was not previously set.
         
     """
-    key = normailze_override_key(key)
+    key = normalize_override_key(key)
     if callback is not None:
         old_value = deep_getattr(container, key, callback_missing_value)
         callback_key = callback_key_prefix + key
         callback(callback_key, value, old_value)
-    deep_setattr(container, key, value)
+    deep_setattr(container, key, value, auto_constructor = type(container))
 
-def normailze_override_key(key):
+def normalize_override_key(key):
     """
     .. testsetup:: 
 
-        from figura.override import normailze_override_key
+        from figura.override import normalize_override_key
 
-    >>> normailze_override_key('a__b__c')
+    >>> normalize_override_key('a__b__c')
     'a.b.c'
     """
     if key.startswith('__'):

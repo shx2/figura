@@ -7,6 +7,7 @@ import inspect
 from .misc import merge_dicts
 from .errors import ConfigParsingError
 from .container import ConfigContainer
+from .override import ConfigOverrideSet
 from .importutils import import_figura_file
 
 
@@ -133,10 +134,15 @@ class ConfigParser(object):
         }
         
         # create the container
-        container = ConfigContainer(attrs)
+        metadata_to_apply = merge_dicts(metadata, meta_attrs)
+        if metadata_to_apply.get('is_override_set', False):
+            container_cls = ConfigOverrideSet
+        else:
+            container_cls = ConfigContainer
+        container = container_cls(attrs)
         
         # set metadata attributes on the container
-        container.get_metadata().update(merge_dicts(metadata, meta_attrs))
+        container.get_metadata().update(metadata_to_apply)
         
         return container
 
