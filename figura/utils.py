@@ -95,7 +95,8 @@ def build_config(*paths, **kwargs):
     configs = [ _to_config(conf) for conf in paths ]
     
     # using the default_config if the first config passed is an overrideset
-    use_default = (len(configs) == 0) or configs[0].get_metadata().is_override_set
+    use_default = (len(configs) == 0) or \
+        (isinstance(configs[0], ConfigContainer) and configs[0].get_metadata().is_override_set)
     if default_config is not None and use_default:
         configs = [ _to_config(default_config) ] + configs
     

@@ -15,7 +15,7 @@ By file path: not support currently.
 
 import argparse
 
-from figura import build_config
+from figura import build_config, ConfigContainer
 from figura.cli import add_override_argument
 
 ###############################################################################
@@ -37,8 +37,13 @@ def main():
     if args.override:
         config.apply_overrides(args.override)
 
-    formatter_method = FORMAT_MAP[args.format]
-    print(getattr(config, formatter_method)())
+    if isinstance(config, ConfigContainer):
+        # format the container and print it:
+        formatter_method = FORMAT_MAP[args.format]
+        print(getattr(config, formatter_method)())
+    else:
+        # an atomic value. just print it:
+        print(config)
             
 ###############################################################################
 
