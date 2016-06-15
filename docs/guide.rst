@@ -4,7 +4,7 @@ Figura Reference Guide
 
 This is a reference guide of the `Figura`_ configuation language.
 
-.. _Figura: figura.html
+.. _Figura: index.html
 
 
 
@@ -54,8 +54,8 @@ When processed and formatted as JSON::
 
     > figura_print sample_0020_basic
     {
-      "display_font": "arial",
       "display_color": "green",
+      "display_font": "arial",
       "greeting": "Hello, World!"
     }
 
@@ -97,14 +97,14 @@ When processed and formatted as JSON::
         "a": 1
       },
       "params2": {
-        "x": 111,
         "nested_params": {
-          "z": 999,
-          "y": 555,
           "deeply_nested_params": {
             "z": 0
-          }
-        }
+          },
+          "y": 555,
+          "z": 999
+        },
+        "x": 111
       }
     }
 
@@ -141,10 +141,6 @@ When processed and formatted as JSON::
 
     > figura_print sample_0040_reusing
     {
-      "ftp_connetion": {
-        "host": "localhost",
-        "port": 21
-      },
       "client": {
         "connection": {
           "host": "localhost",
@@ -154,6 +150,10 @@ When processed and formatted as JSON::
       "http_connection": {
         "host": "localhost",
         "port": 80
+      },
+      "ftp_connetion": {
+        "host": "localhost",
+        "port": 21
       }
     }
 
@@ -224,14 +224,14 @@ When processed and formatted as JSON::
 
     > figura_print sample_0060_extending
     {
-      "debug_logging": {
-        "traffic": "debug",
-        "engine": "debug"
-      },
       "analysis_debug_logging": {
-        "traffic": "warning",
         "engine": "debug",
+        "traffic": "warning",
         "analyzer": "debug"
+      },
+      "debug_logging": {
+        "engine": "debug",
+        "traffic": "debug"
       }
     }
 
@@ -286,16 +286,16 @@ When processed and formatted as JSON::
 
     > figura_print sample_0070_overlaying
     {
-      "a2": {
-        "b": {
-          "x": 1,
-          "y": 3
-        }
-      },
       "a": {
         "b": {
-          "x": 1,
-          "y": 2
+          "y": 2,
+          "x": 1
+        }
+      },
+      "a2": {
+        "b": {
+          "y": 3,
+          "x": 1
         }
       }
     }
@@ -328,8 +328,8 @@ When processed and formatted as JSON::
     {
       "a": {
         "b": {
-          "y": 2,
-          "x": 1
+          "x": 1,
+          "y": 2
         }
       },
       "a2": {
@@ -370,12 +370,12 @@ When applied to ``sample_0050_importing``::
 
     > figura_print sample_0050_importing sample_0080_overrides
     {
-      "greeting": "Hello, World!",
       "my_favorites": {
         "greeting": "Hello, World!",
         "pet": "dog",
         "color": "red"
-      }
+      },
+      "greeting": "Hello, World!"
     }
 
 :note: When given multiple arguments, ``figura_print`` interprets all arguments which come after the first
@@ -443,8 +443,8 @@ An example of applying overrides, passed from command line, to ``sample_0030_con
       "params2": {
         "x": "A_NEW_VALUE1",
         "nested_params": {
-          "y": 555,
           "z": "A_NEW_VALUE2",
+          "y": 555,
           "deeply_nested_params": {
             "z": 0
           }
@@ -575,14 +575,14 @@ When processed and formatted as JSON::
 
     > figura_print sample_0930_arithmetics
     {
+      "B": {
+        "polling_interval": 600
+      },
       "C": {
         "polling_interval": 2400
       },
       "A": {
         "polling_interval": 300
-      },
-      "B": {
-        "polling_interval": 600
       }
     }
 
