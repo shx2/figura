@@ -2,7 +2,7 @@
 Figura Tutorial
 ===============
 
-This a tutorial for the `Figura`_ configuation generation language.
+This a tutorial for the `Figura`_ configuation language.
 
 *UNDER CONSTRUCTION*...
 

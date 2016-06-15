@@ -1,0 +1,1 @@
+You can make use of all the nice features of Python's import mechanism, e.g. relative imports, ``from mod import *``, etc.

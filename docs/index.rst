@@ -6,7 +6,7 @@
 FIGURA
 ==================================
 
-Figura is an *expressive configuration generation language* based on python syntax.
+Figura is an *expressive high-level configuration language* based on python syntax.
 
 Figura's Documentation
 ==================================

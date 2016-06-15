@@ -1,7 +1,7 @@
 """
 A python package for parsing and working with `Figura <index.html>`_ config files.
 
-This library also includes an executable script ``figura/tools/figura_print.py``, for processing
+This library also includes an executable ``figura_print`` command, for processing
 your figura config files and generating your configuration, printing it as a JSON structure.
 The generated JSON-structured configuration can then be read by programs written in
 any other language (using its JSON parser).
@@ -13,6 +13,8 @@ are useful for integrating your python scripts with figura configurations and ov
 configurations and overrides into single ConfigContainer.
 
 """
+
+from . import version
 
 from .container import ConfigContainer
 from .override import ConfigOverrideSet
