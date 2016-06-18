@@ -52,10 +52,10 @@ In its most basic form, a figura configuration file is just a python module, whi
 
 When processed and formatted as JSON::
 
-    > figura_print sample_0020_basic
+    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0020_basic
     {
-      "display_color": "green",
-      "display_font": "arial",
+      "display_font": "arial", 
+      "display_color": "green", 
       "greeting": "Hello, World!"
     }
 
@@ -90,21 +90,21 @@ Config container can also be nested.
 
 When processed and formatted as JSON::
 
-    > figura_print sample_0030_containers
+    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0030_containers
     {
       "params1": {
-        "b": "two",
-        "a": 1
-      },
+        "a": 1, 
+        "b": "two"
+      }, 
       "params2": {
+        "x": 111, 
         "nested_params": {
+          "y": 555, 
+          "z": 999, 
           "deeply_nested_params": {
             "z": 0
-          },
-          "y": 555,
-          "z": 999
-        },
-        "x": 111
+          }
+        }
       }
     }
 
@@ -139,21 +139,21 @@ This is important for avoiding config/code duplication.
 
 When processed and formatted as JSON::
 
-    > figura_print sample_0040_reusing
+    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0040_reusing
     {
+      "ftp_connetion": {
+        "host": "localhost", 
+        "port": 21
+      }, 
+      "http_connection": {
+        "host": "localhost", 
+        "port": 80
+      }, 
       "client": {
         "connection": {
-          "host": "localhost",
+          "host": "localhost", 
           "port": 80
         }
-      },
-      "http_connection": {
-        "host": "localhost",
-        "port": 80
-      },
-      "ftp_connetion": {
-        "host": "localhost",
-        "port": 21
       }
     }
 
@@ -181,13 +181,13 @@ Config params and containers defined in other figura files can be imported using
 
 When processed and formatted as JSON::
 
-    > figura_print sample_0050_importing
+    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0050_importing
     {
-      "greeting": "Hello, World!",
       "my_favorites": {
-        "color": "green",
+        "color": "green", 
         "greeting": "Hello, World!"
-      }
+      }, 
+      "greeting": "Hello, World!"
     }
 
 You can make use of all the nice features of Python's import mechanism, e.g. relative imports, ``from mod import *``, etc.
@@ -222,15 +222,15 @@ This is done using Python's inheritance syntax.
 
 When processed and formatted as JSON::
 
-    > figura_print sample_0060_extending
+    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0060_extending
     {
       "analysis_debug_logging": {
-        "engine": "debug",
-        "traffic": "warning",
+        "engine": "debug", 
+        "traffic": "warning", 
         "analyzer": "debug"
-      },
+      }, 
       "debug_logging": {
-        "engine": "debug",
+        "engine": "debug", 
         "traffic": "debug"
       }
     }
@@ -284,17 +284,17 @@ Figura treats such cases as overlays.
 
 When processed and formatted as JSON::
 
-    > figura_print sample_0070_overlaying
+    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0070_overlaying
     {
       "a": {
         "b": {
-          "y": 2,
+          "y": 2, 
           "x": 1
         }
-      },
+      }, 
       "a2": {
         "b": {
-          "y": 3,
+          "y": 3, 
           "x": 1
         }
       }
@@ -324,14 +324,14 @@ For choosing the overshadow semantics over overlay, use the ``__opaque__=True`` 
 
 When processed and formatted as JSON::
 
-    > figura_print sample_0075_opaque
+    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0075_opaque
     {
       "a": {
         "b": {
-          "x": 1,
-          "y": 2
+          "y": 2, 
+          "x": 1
         }
-      },
+      }, 
       "a2": {
         "b": {
           "y": 3
@@ -371,10 +371,10 @@ When applied to ``sample_0050_importing``::
     > figura_print sample_0050_importing sample_0080_overrides
     {
       "my_favorites": {
-        "greeting": "Hello, World!",
-        "pet": "dog",
-        "color": "red"
-      },
+        "color": "red", 
+        "pet": "dog", 
+        "greeting": "Hello, World!"
+      }, 
       "greeting": "Hello, World!"
     }
 
@@ -408,11 +408,11 @@ When applied to ``sample_0050_importing``, ``my_favorites.greeting`` is excluded
 
     > figura_print sample_0050_importing sample_0083_opaqueoverrides
     {
-      "greeting": "Hello, World!",
       "my_favorites": {
-        "pet": "dog",
-        "color": "red"
-      }
+        "color": "red", 
+        "pet": "dog"
+      }, 
+      "greeting": "Hello, World!"
     }
 
 :note: ``figura_print`` supports taking ``--override`` cli option, which demostrate how flat override sets are useful.
@@ -440,19 +440,19 @@ An example of applying overrides, passed from command line, to ``sample_0030_con
 
     > figura_print sample_0030_containers --override params2.x=A_NEW_VALUE1 --override params2.nested_params.z=A_NEW_VALUE2
     {
+      "params1": {
+        "a": 1, 
+        "b": "two"
+      }, 
       "params2": {
-        "x": "A_NEW_VALUE1",
+        "x": "A_NEW_VALUE1", 
         "nested_params": {
-          "z": "A_NEW_VALUE2",
-          "y": 555,
+          "y": 555, 
+          "z": "A_NEW_VALUE2", 
           "deeply_nested_params": {
             "z": 0
           }
         }
-      },
-      "params1": {
-        "b": "two",
-        "a": 1
       }
     }
 
@@ -488,8 +488,8 @@ Here we access a nested container::
 
     > figura_print sample_0030_containers.params2.nested_params
     {
-      "y": 555,
-      "z": 999,
+      "y": 555, 
+      "z": 999, 
       "deeply_nested_params": {
         "z": 0
       }
@@ -527,10 +527,10 @@ in the resulting config container.
 
 When processed and formatted as JSON::
 
-    > figura_print sample_0910_hidden
+    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0910_hidden
     {
-      "my_public_greeting": "hey",
-      "random_greeting": "Hello, World!"
+      "random_greeting": "Hello, World!", 
+      "my_public_greeting": "hey"
     }
 
 
@@ -573,18 +573,53 @@ Expressions and Arithmetics
 
 When processed and formatted as JSON::
 
-    > figura_print sample_0930_arithmetics
+    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0930_arithmetics
     {
-      "B": {
-        "polling_interval": 600
-      },
-      "C": {
-        "polling_interval": 2400
-      },
       "A": {
         "polling_interval": 300
+      }, 
+      "C": {
+        "polling_interval": 2400
+      }, 
+      "B": {
+        "polling_interval": 600
       }
     }
+
+
+
+
+Reading Environment Variables
+-------------------------------
+
+It is sometimes useful to read environment variables from inside a figura file. As in any Python
+code, this is done using ``os.environ``.
+
+
+::
+
+    > cat sample_0940_envvars.py
+    from os import environ as _ENV
+    contact_email = _ENV.get('EMAIL', 'nobody@nowhere.com')
+
+When processed and formatted as JSON, with the env var set::
+
+    > EMAIL=me@myself.com figura_print sample_0940_envvars
+    {
+      "contact_email": "me@myself.com"
+    }
+
+Using the default value when the env var is not defined::
+
+    > figura_print sample_0940_envvars
+    {
+      "contact_email": "nobody@nowhere.com"
+    }
+
+:note: Simply writing ``from os import environ`` adds the variable ``environ`` to the namespace and
+    ends up including the full environment in the config file (or barfing if it includes values which
+    cannot be understood as valid figura constructs). To avoid this namespace pollution, we make it
+    hidden: ``from os import environ as _ENV``.
 
 
 

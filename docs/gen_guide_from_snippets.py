@@ -5,6 +5,7 @@ snippets contained in the guide directories (docs/guide/ and docs/tutorial).
 """
 
 import os
+import re
 import subprocess
 import argparse
 try:
@@ -16,6 +17,11 @@ except ImportError:
 # functions
 
 def process_part(guide_dir, part):
+    
+    figura_dir = os.path.normpath(os.path.join(guide_dir, '..', '..'))
+    figura_print = os.path.join(figura_dir, 'figura', 'tools', 'figura_print.py')
+    pythonpath = ':'.join([ figura_dir, guide_dir ])
+    
     OUT = StringIO()
 
     def echo(*args, **kwargs):
@@ -55,13 +61,19 @@ def process_part(guide_dir, part):
             msgs_and_cmds = list(zip(lines[::2], lines[1::2]))
         else:
             msg = 'When processed and formatted as JSON'
-            cmd = 'figura_print %s' % config_import_path
+            cmd = '%s %s' % ( figura_print, config_import_path )
             msgs_and_cmds = [ (msg, cmd) ]
         for msg, cmd in msgs_and_cmds:
+            # HACK: to make sure we find figura_print command, we replace it with the
+            # path in the figura_print var we have:
+            symbolic_cmd = cmd
+            if 'figura_print' in cmd.split():
+                cmd = re.sub('figura_print', figura_print, cmd)
+            
             echo('%s::' % msg)
             echo('')
-            echo(indent_lines('    ', '> %s' % cmd))
-            echo(indent_lines('    ', run_cmd(cmd, pythonpath = guide_dir)))
+            echo(indent_lines('    ', '> %s' % symbolic_cmd))
+            echo(indent_lines('    ', run_cmd(cmd, pythonpath = pythonpath)))
             echo('')
 
     ############################
