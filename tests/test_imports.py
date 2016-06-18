@@ -18,8 +18,6 @@ TEMPDIR = os.path.join(tempfile.gettempdir(), TEMPDIR_NAME)
 BASEDIR = os.path.dirname(__file__)
 CONFIGDIR = os.path.join(BASEDIR, 'config')
 
-sys.path.append(TEMPDIR)
-
 ################################################################################
 
 class BasicTest(unittest.TestCase):
@@ -88,6 +86,8 @@ class BasicTest(unittest.TestCase):
     #===================================================================================================================
 
     def _test_reload(self, path_to_reload, filepath_to_modify):
+        if TEMPDIR not in sys.path:
+            sys.path.append(TEMPDIR)
         config = read_config(path_to_reload).some_params
         self.assertEqual(config.a, 1)
         self.assertRaises(KeyError, lambda: config['z'])
