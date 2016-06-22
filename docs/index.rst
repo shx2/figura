@@ -14,10 +14,43 @@ What is Figura?
 
 Figura is an *expressive high-level configuration language* based on Python syntax.
 
+Getting Started
+==================================
+
+Installation
+-----------------
+
+Install the `python package <figura.html>`_ using ``pip``::
+
+    % pip install figura
+    
+This also installs the ``figura_print`` executable script for parsing Figura configuration files.
+
+Hello World!
+--------------------
+
+The package comes with a ready-to-use "Hello, World!" configuration file. After parsing it, the raw config looks like this::
+
+    % figura_print figura.hello_world
+    {
+      "greeting": {
+        "greetee": "World", 
+        "format": "Hello, %s!"
+      }
+    }
+
+A sample Python snippet for printing the greeting::
+
+   from figura import read_config
+   greeting_config = read_config('figura.hello_world').greeting
+   print(greeting_config.format % greeting_config.greetee)
+   #  =>  Hello, World!
+
+
 Documentation
 ==================================
 
-For an easy start, check out the `Tutorial <tutorial.html>`_ and `Reference Guide <guide.html>`_.
+For an easy start, check out the `Tutorial (under construction) <tutorial.html>`_ and `Reference Guide <guide.html>`_.
 
 Also refer to the documentation of the `Figura Python package <figura.html>`_.
 
