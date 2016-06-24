@@ -61,7 +61,7 @@ def process_part(guide_dir, part):
             msgs_and_cmds = list(zip(lines[::2], lines[1::2]))
         else:
             msg = 'When processed and formatted as JSON'
-            cmd = '%s %s' % ( figura_print, config_import_path )
+            cmd = '%s %s' % ( 'figura_print', config_import_path )
             msgs_and_cmds = [ (msg, cmd) ]
         for msg, cmd in msgs_and_cmds:
             # HACK: to make sure we find figura_print command, we replace it with the

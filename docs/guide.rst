@@ -52,7 +52,7 @@ In its most basic form, a figura configuration file is just a python module, whi
 
 When processed and formatted as JSON::
 
-    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0020_basic
+    > figura_print sample_0020_basic
     {
       "display_font": "arial", 
       "display_color": "green", 
@@ -90,7 +90,7 @@ Config container can also be nested.
 
 When processed and formatted as JSON::
 
-    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0030_containers
+    > figura_print sample_0030_containers
     {
       "params1": {
         "a": 1, 
@@ -139,7 +139,7 @@ This is important for avoiding config/code duplication.
 
 When processed and formatted as JSON::
 
-    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0040_reusing
+    > figura_print sample_0040_reusing
     {
       "ftp_connetion": {
         "host": "localhost", 
@@ -181,7 +181,7 @@ Config params and containers defined in other figura files can be imported using
 
 When processed and formatted as JSON::
 
-    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0050_importing
+    > figura_print sample_0050_importing
     {
       "my_favorites": {
         "color": "green", 
@@ -222,7 +222,7 @@ This is done using Python's inheritance syntax.
 
 When processed and formatted as JSON::
 
-    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0060_extending
+    > figura_print sample_0060_extending
     {
       "analysis_debug_logging": {
         "engine": "debug", 
@@ -284,7 +284,7 @@ Figura treats such cases as overlays.
 
 When processed and formatted as JSON::
 
-    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0070_overlaying
+    > figura_print sample_0070_overlaying
     {
       "a": {
         "b": {
@@ -324,7 +324,7 @@ For choosing the overshadow semantics over overlay, use the ``__opaque__=True`` 
 
 When processed and formatted as JSON::
 
-    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0075_opaque
+    > figura_print sample_0075_opaque
     {
       "a": {
         "b": {
@@ -527,7 +527,7 @@ in the resulting config container.
 
 When processed and formatted as JSON::
 
-    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0910_hidden
+    > figura_print sample_0910_hidden
     {
       "random_greeting": "Hello, World!", 
       "my_public_greeting": "hey"
@@ -573,7 +573,7 @@ Expressions and Arithmetics
 
 When processed and formatted as JSON::
 
-    > /home/shx2/d/figura/figura/tools/figura_print.py sample_0930_arithmetics
+    > figura_print sample_0930_arithmetics
     {
       "A": {
         "polling_interval": 300
