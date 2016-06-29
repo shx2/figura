@@ -64,17 +64,26 @@ def process_part(guide_dir, part):
             cmd = '%s %s' % ( 'figura_print', config_import_path )
             msgs_and_cmds = [ (msg, cmd) ]
         for msg, cmd in msgs_and_cmds:
+            symbolic_cmd = cmd
+            if '#' in cmd:
+                symbolic_cmd, cmd = cmd.split('#')
+                symbolic_cmd = symbolic_cmd.strip()
+                cmd = cmd.strip()
             # HACK: to make sure we find figura_print command, we replace it with the
             # path in the figura_print var we have:
-            symbolic_cmd = cmd
             if 'figura_print' in cmd.split():
                 cmd = re.sub('figura_print', figura_print, cmd)
             
-            echo('%s::' % msg)
-            echo('')
-            echo(indent_lines('    ', '> %s' % symbolic_cmd))
-            echo(indent_lines('    ', run_cmd(cmd, pythonpath = pythonpath)))
-            echo('')
+            is_real_cmd = cmd.lower() != 'pass'
+            if is_real_cmd:
+                echo('%s::' % msg)
+                echo('')
+                echo(indent_lines('    ', '> %s' % symbolic_cmd))
+                echo(indent_lines('    ', run_cmd(cmd, pythonpath = pythonpath)))
+                echo('')
+            else:
+                echo('%s' % msg)
+                echo('')
 
     ############################
     # post
@@ -107,7 +116,11 @@ def main():
         output_file = os.path.join(here, '%s.rst' % guide_type)
     
     # find files to process:
-    part_names = sorted(set( f.split('.')[0] for f in os.listdir(guide_dir) if not f.startswith('_') ))
+    part_names = sorted(set(
+        f.split('.')[0]
+        for f in os.listdir(guide_dir)
+        if re.search(r'\d\d\d\d', f) and not f.startswith('_')
+    ))
     with open(output_file, 'w') as OUT:
         for part in part_names:
             snippet = process_part(guide_dir, part)

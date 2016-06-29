@@ -14,21 +14,9 @@ This is a reference guide of the `Figura`_ configuation language.
 Prerequisites
 ================
 
-Below are the prerequisites to running the examples in this guide.
+See Figura's `Getting Started <index.html#getting-started>`_ section.
 
 The source files can be found on `github`_, under ``docs/guide/``.
-
-Every figura configuration file is a python module. When the file is processed,
-the python interpreter is used to first import the module. This means that in order for the
-python interpreter to find the modules, PYTHONPATH needs to be set accordingly.
-
-In a \*nix system (using ``bash``), you can set PYTHONPATH like this::
-
-    export PYTHONPATH=/PATH/TO/FIGURA/docs/guide/
-
-Also, you can see that the ``guide/`` directory, under which the config files included in
-this guide reside, contains a ``__init__.py`` file. This is required for the same reason --
-to make the modules python-importable.
 
 .. _github: https://github.com/shx2/figura.git
 
@@ -349,7 +337,8 @@ Figura supports a special type of config containers: override sets. Override set
 which do not stand by themselves, but are meant to be applied to other config containers, overriding
 some of their values (think: patches).
 
-Override sets are defined using the ``__override__=True`` metadata directive.
+Override sets are defined using the ``__override__=True`` metadata directive.  This definition propagates
+down to nested containers.
 
 As with extending containers, overriding deep values is done using deep override sets, reflecting the same
 structure. Here too, nested containers are interpreted as overlays (not overshadows).
@@ -380,7 +369,7 @@ When applied to ``sample_0050_importing``::
 
 :note: When given multiple arguments, ``figura_print`` interprets all arguments which come after the first
     as override sets to be applied to the first. It is therefore useful for flexibly constructing configs, by
-    combining the main config with one or more override sets.
+    combining the main config with one or more override sets. Here, we make use of this flexibility.
 
 
 
@@ -499,6 +488,41 @@ It also works with a "leaf" value::
 
     > figura_print sample_0030_containers.params1.b
     two
+
+
+
+
+Entry Points
+=========================
+
+There can be cases where you'd want to define config params at the top-level of
+your config file (so that your program can access the values without extra nesting levels),
+but at the same time to be able to use it as a base container elsewhere (e.g. to extend it
+in another config file).
+
+Use the ``__entry_point__`` directive for this.
+
+
+::
+
+    > cat sample_0100_entry.py
+    class level_to_skip:
+        top_level_param = 'unnested'
+        
+    __entry_point__ = level_to_skip
+    
+    # can also be specified by name, like:
+    #__entry_point__ = 'level_to_skip'
+
+When processed and formatted as JSON::
+
+    > figura_print sample_0100_entry
+    {
+      "top_level_param": "unnested"
+    }
+
+:See also: There is a section in `the tutorial <tutorial.html#reorganizing-files>`_ which demostrates how this can be useful.
+
 
 
 
