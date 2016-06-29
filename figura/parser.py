@@ -3,6 +3,7 @@ Parsing Figura config files.
 """
 
 import inspect
+import six
 
 from .misc import merge_dicts
 from .errors import ConfigParsingError
@@ -97,8 +98,16 @@ class ConfigParser(object):
             return x
         
         if type(x) == type(inspect):
+            
             # the top-level module object --> a ConfigContainer
             raw_attrs = self._get_dunder_dict(x)
+            
+            # handle the __entry_point___ directive:
+            new_x = self._find_entry_point(raw_attrs)
+            if new_x is not None:
+                # return the result of the recursive call on the new entry point
+                return self._python_to_conf(new_x)
+
         elif _is_raw_container(x):
             # a class --> a ConfigContainer
             mro_dicts = [
@@ -237,7 +246,24 @@ class ConfigParser(object):
                 x = getattr(x, attr_path, *args)
                 opaque = opaque or _is_marked_opaque(x)
                 return x, opaque
-    
+
+    #===================================================================================================================
+    # __entry_point___ support
+    #===================================================================================================================
+
+    def _find_entry_point(self, attrs):
+        entry_point = attrs.get('__entry_point__')
+        if entry_point is not None:
+            if isinstance(entry_point, six.string_types):
+                # entry_point is given by name
+                try:
+                    entry_point = attrs[entry_point]
+                except KeyError:
+                    raise ConfigParsingError('entry-point not found: %s' % ( entry_point, ))
+            else:
+                # entry_point is given by pointing to to a container
+                pass
+        return entry_point
 
 ################################################################################
 
