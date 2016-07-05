@@ -4,7 +4,7 @@ Definition of the config-container type.
 
 import json
 
-from .misc import Struct, merge_dicts, deep_getattr, deep_setattr
+from .misc import Struct, merge_dicts, deep_getattr, deep_setattr, coerce_type
 
 
 ################################################################################
@@ -39,6 +39,12 @@ class ConfigContainerMixin():
 
         .. _deep_setattr:
         """
+        try:
+            current_value = deep_getattr(self, attr_path)
+            value = coerce_type(current_value, value)
+        except AttributeError:
+            pass
+
         return deep_setattr(self, attr_path, value)
 
     def apply_overrides(self, overrides, **kwargs):
