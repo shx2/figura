@@ -19,7 +19,33 @@ from .errors import ConfigParsingError
 
 ################################################################################
 
-REMOVE_FROM_SYS_MODULES = True
+class NoImportSideEffectsContext(object):
+    
+    def __init__(self, remove_from_sys_modules = True):
+        self.remove_from_sys_modules = remove_from_sys_modules
+    
+    def __enter__(self):
+
+        imp.acquire_lock()
+
+        # suppress writing of .pyc files:
+        self.prev_dont_write_bytecode = sys.dont_write_bytecode
+        sys.dont_write_bytecode = True
+
+        if self.remove_from_sys_modules:
+            # remember which modules were already loaded before we run the import.
+            self.oldmods = set(sys.modules.keys())
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.remove_from_sys_modules:
+            # remove all modules which got added to sys.modules in this import, to
+            # ensure the next time we are here, they get reloaded.
+            newmods = set(sys.modules.keys()) - self.oldmods
+            for newmod in newmods:
+                sys.modules.pop(newmod, None)
+
+        sys.dont_write_bytecode = self.prev_dont_write_bytecode
+        imp.release_lock()
 
 ################################################################################
 
@@ -34,36 +60,8 @@ def import_module_no_side_effects(path):
       module in ``sys.modules``). this also applies for modules being imported
       indirectly during the importing of ``path``.
     """
-    try:
-        
-        imp.acquire_lock()
-
-        # suppress writing of .pyc files:
-        # NOTE this part isn't thread safe
-        prev_dont_write_bytecode = sys.dont_write_bytecode
-        sys.dont_write_bytecode = True
-
-        if REMOVE_FROM_SYS_MODULES:
-            # remember which modules were already loaded before we
-            # run the import.
-            # This is only required in py2, because py3 has importlib.reload().
-            oldmods = set(sys.modules.keys())
-        
-        # do the actual parsing:
-        modobj = _raw_import(path)
-        
-        if REMOVE_FROM_SYS_MODULES:
-            # remove all modules which got added to sys.modules in this import, to
-            # ensure the next time we are here, they get reloaded.
-            # NOTE this part isn't thread safe
-            newmods = set(sys.modules.keys()) - oldmods
-            for newmod in newmods:
-                sys.modules.pop(newmod, None)
-
-        return modobj
-    finally:
-        sys.dont_write_bytecode = prev_dont_write_bytecode
-        imp.release_lock()
+    with NoImportSideEffectsContext():
+        return _raw_import(path)
 
 def _raw_import(path):
     # First, invalidate caches!
@@ -113,7 +111,8 @@ def is_importable_path(path):
     :param path: a python import path
     """
     try:
-        return _find_module(path) is not None
+        with NoImportSideEffectsContext():
+            return _find_module(path) is not None
     except (ImportError, AttributeError):
         return False
 
