@@ -29,7 +29,9 @@ setup(
 
     packages=find_packages(exclude=['tests*', 'figura.tests*']),
     platforms = ["POSIX", "Windows"],
-    install_requires=[],
+    install_requires=[
+        'six',
+    ],
     entry_points={
         'console_scripts': [
             'figura_print=figura.tools.figura_print:main',
