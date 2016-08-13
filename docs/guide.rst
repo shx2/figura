@@ -343,7 +343,7 @@ down to nested containers.
 As with extending containers, overriding deep values is done using deep override sets, reflecting the same
 structure. Here too, nested containers are interpreted as overlays (not overshadows).
 
-An override set ISA config container, thus it is just as flexible: you can define it by extending a base
+An override set *is-a* config container, thus it is just as flexible: you can define it by extending a base
 override set, you can import it from another module, you can apply another override set to it, etc.
 
 
