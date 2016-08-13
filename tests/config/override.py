@@ -29,14 +29,6 @@ class test_overrides_opaque1:
     class verify:
         entry_point = 'A3_result'
 
-class test_overrides_flat1:
-    is_unittest = True
-    class construct:
-        entry_point = 'A'
-        apply_overrides = [ ('A', 'A4_overrides') ]
-    class verify:
-        entry_point = 'A4_result'
-
 ################################################################
 # Unittest data
 
@@ -102,26 +94,5 @@ class A3_result:
         b2 = 8
     class D:
         d = 'dd'
-
-###############
-# This override set, in a flat ("cli") form, when applied to A:
-# - overrides A.B.b
-# - overrides A.B.C.c2
-# - sets a new param A.B.C.c3
-
-class A4_overrides:
-    __override__ = True
-    B__b = 22
-    B__C__c2 = 66
-    B__C__c3 = 77
-
-class A4_result:
-    a = 1
-    class B:
-        b = 22
-        class C:
-            c1 = 5
-            c2 = 66
-            c3 = 77
 
 ###############

@@ -8,7 +8,7 @@ import six
 from .misc import merge_dicts
 from .errors import ConfigParsingError
 from .container import ConfigContainer
-from .override import ConfigOverrideSet
+from .override import ConfigOverrideSet, normalize_override_key
 from .importutils import import_figura_file
 
 
@@ -195,6 +195,7 @@ class ConfigParser(object):
             if k.startswith('_'):
                 continue
             # the rest are real
+            k = normalize_override_key(k)
             real_attrs[k] = v
         return real_attrs, meta_attrs
     

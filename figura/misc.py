@@ -102,12 +102,14 @@ def deep_setattr(x, attr_path, value, **kwargs):
 
 def _deep_attr_operator(func, x, attr_path, *args, **kwargs):
     auto_constructor = kwargs.pop('auto_constructor', None)
+    key_normalizer = kwargs.pop('key_normalizer', lambda x: x)
     assert not kwargs, kwargs
     while True:
         attr, delim, rest = attr_path.partition('.')
+        attr = key_normalizer(attr)
         if not delim:
             # deepest level -- apply func:
-            return func(x, attr_path, *args)
+            return func(x, attr, *args)
         # go one level deeper:
         try:
             x = getattr(x, attr)

@@ -51,7 +51,7 @@ def apply_overrides_to_config(container, overrides, callback_key_prefix = '', en
             
             # old_value and value are both containers -- a nested override, apply recursively
             nested_container = container[key]
-            cur_key_prefix = '%s.' % ( normalize_override_key(key), )
+            cur_key_prefix = '%s.' % ( key, )
             if callback_key_prefix:
                 cur_key_prefix = '%s.%s' % ( callback_key_prefix, cur_key_prefix )
             apply_overrides_to_config(
@@ -92,12 +92,18 @@ def apply_override(
         was not previously set.
         
     """
-    key = normalize_override_key(key)
     if callback is not None:
-        old_value = deep_getattr(container, key, callback_missing_value)
+        old_value = deep_getattr(
+            container, key, callback_missing_value,
+            key_normalizer = normalize_override_key,
+        )
         callback_key = callback_key_prefix + key
         callback(callback_key, value, old_value)
-    deep_setattr(container, key, value, auto_constructor = type(container))
+    deep_setattr(
+        container, key, value,
+        auto_constructor = type(container),
+        key_normalizer = normalize_override_key,
+    )
 
 def normalize_override_key(key):
     """
