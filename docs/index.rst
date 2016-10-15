@@ -38,7 +38,15 @@ This also installs the ``figura_print`` executable script for parsing Figura con
 Hello World!
 --------------------
 
-The package comes with a ready-to-use "Hello, World!" configuration file. After parsing it, the raw config looks like this::
+The package comes with a ready-to-use "hello_world.py" configuration file::
+
+    % cat hello_world.py
+    """ A sample Figura configuration file for greeting The World! """
+    class greeting:
+        format = 'Hello, %s!'
+        greetee = 'World'
+
+After parsing it, the raw config (in JSON form) looks like this::
 
     % figura_print figura.hello_world
     {
