@@ -21,6 +21,7 @@ def process_part(guide_dir, part):
     figura_dir = os.path.normpath(os.path.join(guide_dir, '..', '..'))
     figura_print = os.path.join(figura_dir, 'figura', 'tools', 'figura_print.py')
     pythonpath = ':'.join([ figura_dir, guide_dir ])
+    fig_ext = 'fig'
     
     OUT = StringIO()
 
@@ -41,11 +42,11 @@ def process_part(guide_dir, part):
     ############################
     # config file
     ############################
-    config_path = os.path.join(guide_dir, '%s.py' % part)
+    config_path = os.path.join(guide_dir, '%s.%s' % ( part, fig_ext ))
     cmd_path = os.path.join(guide_dir, '%s.cmd' % part)
     if os.path.exists(config_path) or os.path.exists(cmd_path):
         config_display_path = os.path.basename(config_path)
-        config_import_path = config_display_path[:-3]  # strip ".py" suffix
+        config_import_path = config_display_path[ : -(len(fig_ext)+1)]  # strip ".fig" suffix
         # show config file's contents:
         if os.path.exists(config_path):
             echo('::')
@@ -96,7 +97,9 @@ def indent_lines(indent, multiline_string):
     return '\n'.join( indent + line for line in multiline_string.splitlines() )
 
 def run_cmd(cmd, pythonpath):
-    out = subprocess.check_output('PYTHONPATH=%s %s' % (pythonpath, cmd), shell=True)
+    full_cmd = 'PYTHONPATH=%s %s' % (pythonpath, cmd)
+    #print(full_cmd)
+    out = subprocess.check_output(full_cmd, shell=True)
     return out.decode("utf-8") 
     
 

@@ -10,6 +10,8 @@ import tempfile
 import errno
 
 from figura import read_config
+from figura.errors import ConfigParsingError
+from figura.settings import get_setting, set_setting
 
 ################################################################################
 
@@ -17,6 +19,7 @@ TEMPDIR_NAME = 'figura_%s'% os.getpid()
 TEMPDIR = os.path.join(tempfile.gettempdir(), TEMPDIR_NAME)
 BASEDIR = os.path.dirname(__file__)
 CONFIGDIR = os.path.join(BASEDIR, 'config')
+BASE_IMPORT_PATH = 'figura.tests.config'
 
 ################################################################################
 
@@ -36,14 +39,15 @@ class BasicTest(unittest.TestCase):
 
     def tearDown(self):
         # delete temp dir
-        shutil.rmtree(TEMPDIR)
+        if os.path.isdir(TEMPDIR):
+            shutil.rmtree(TEMPDIR)
     
     #===================================================================================================================
     # utility functions
     #===================================================================================================================
     
     def tempify_config(self, config_name, desc):
-        config_name += '.py'
+        config_name += '.%s' % get_setting('CONFIG_FILE_EXT')
         tempdir = os.path.join(TEMPDIR, desc)
         self.setup_temp_dir(tempdir)
         src = os.path.join(CONFIGDIR, config_name)
@@ -83,8 +87,6 @@ class BasicTest(unittest.TestCase):
     #    filepath2 = self.tempify_config('importer', 'test_reload_indirect_file_path')
     #    self._test_reload(filepath2, filepath1)
 
-    #===================================================================================================================
-
     def _test_reload(self, path_to_reload, filepath_to_modify):
         if TEMPDIR not in sys.path:
             sys.path.append(TEMPDIR)
@@ -106,6 +108,47 @@ class BasicTest(unittest.TestCase):
         self.assertEqual(config.z, 999)
         self.assertEqual(config.zz, 555)
     
+    #===================================================================================================================
+    # extension
+    #===================================================================================================================
+    
+    def test_same_name_import_vs_config1(self):
+        path = '%s.samename' % BASE_IMPORT_PATH
+        # read_config -- get the fig file
+        self.assertEqual(read_config(path).filetype, 'fig')
+        # import -- get the py file
+        import tests.config.samename
+        self.assertEqual(tests.config.samename.filetype, 'py')
+    
+    def test_same_name_import_vs_config2(self):
+        # same as test_same_name_import_vs_config1, but order is reversed
+        path = '%s.samename' % BASE_IMPORT_PATH
+        # import -- get the py file
+        import tests.config.samename
+        self.assertEqual(tests.config.samename.filetype, 'py')
+        # read_config -- get the fig file
+        self.assertEqual(read_config(path).filetype, 'fig')
+    
+    def test_custom_extension(self):
+        standard_path = '%s.basic1' % BASE_IMPORT_PATH
+        custom_path = '%s.basic2' % BASE_IMPORT_PATH
+        # standard: first works, second raises
+        read_config(standard_path, enable_path_spliting = False)  # should not raise
+        self.assertRaises(ConfigParsingError, read_config, custom_path, enable_path_spliting = False)
+        # change to custom ext, then first raises, second works
+        orig_ext = set_setting('CONFIG_FILE_EXT', 'customfig')
+        try:
+            self.assertRaises(ConfigParsingError, read_config, standard_path, enable_path_spliting = False)
+            read_config(custom_path, enable_path_spliting = False)  # should not raise
+        finally:
+            set_setting('CONFIG_FILE_EXT', orig_ext)
+        # change to a different ext, both should raise
+        orig_ext = set_setting('CONFIG_FILE_EXT', 'nosuchfig')
+        try:
+            self.assertRaises(ConfigParsingError, read_config, standard_path, enable_path_spliting = False)
+            self.assertRaises(ConfigParsingError, read_config, custom_path, enable_path_spliting = False)
+        finally:
+            set_setting('CONFIG_FILE_EXT', orig_ext)
         
 def append_line(filename, line):
     with open(filename, 'a') as f:

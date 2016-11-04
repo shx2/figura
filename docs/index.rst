@@ -38,9 +38,9 @@ This also installs the ``figura_print`` executable script for parsing Figura con
 Hello World!
 --------------------
 
-The package comes with a ready-to-use "hello_world.py" configuration file::
+The package comes with a ready-to-use "hello_world.fig" configuration file::
 
-    % cat hello_world.py
+    % cat hello_world.fig
     """ A sample Figura configuration file for greeting The World! """
     class greeting:
         format = 'Hello, %s!'
@@ -75,7 +75,7 @@ In a \*nix system (using ``bash``), you can set PYTHONPATH like this::
     export PYTHONPATH=/PATH/TO/FIGURA/docs/guide/
 
 Also, the directory (and subdirectories) containing Figura files must contain
-a ``__init__.py`` file. This is required for the same reason --
+a ``__init__.fig`` file. This is required for the same reason --
 to make the modules python-importable.
 
 

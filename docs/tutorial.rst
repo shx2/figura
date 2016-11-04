@@ -51,7 +51,7 @@ the config of each module in its own config container.
 
 ::
 
-    > cat saw_0200_basic.py
+    > cat saw_0200_basic.fig
     """
     Configuration of the SAW system. (<-- This is a docstring)
     """
@@ -165,7 +165,7 @@ In Figura, you should never have to repeat yourself.
 
 ::
 
-    > cat saw_0300_reuse.py
+    > cat saw_0300_reuse.fig
     # The following parameters are prefixed with underscores, to make them "hidden"
     # -- they will not be included in the final config container.
     # This is useful in cases where they only serve as temporary definitions to be reused.
@@ -215,7 +215,7 @@ defines the behavior of the "alerter" object.
 
 ::
 
-    > cat saw_0400_commonality.py
+    > cat saw_0400_commonality.fig
     class _alert:
         enabled = True
         channel = 'email'
@@ -285,7 +285,7 @@ Here is how this is done.
 
 ::
 
-    > cat saw_0500_extending.py
+    > cat saw_0500_extending.fig
     class _saw_module:
         class alert:
             enabled = True
@@ -327,7 +327,7 @@ demonstrated below.
 
 ::
 
-    > cat saw_0600_overlaying.py
+    > cat saw_0600_overlaying.fig
     class _saw_module:
         class alert:
             enabled = True
@@ -391,9 +391,9 @@ The next sections are based on the config we have so far, with all the changes a
 from past sections.
 
 
-To recap, this is the full config file that we have so far. We name it ``saw.py``::
+To recap, this is the full config file that we have so far. We name it ``saw.fig``::
 
-    > cat tutorial/saw.py
+    > cat tutorial/saw.fig
     
     _root_dir = '/saw/data/'
     _raw_content_dir = _root_dir + 'raw'
@@ -470,7 +470,7 @@ Instead, we can define file's *entry point*, using the ``__entry_point__`` direc
 
 ::
 
-    > cat saw_0750_entry.py
+    > cat saw_0750_entry.fig
     from saw import saw
     __entry_point__ = saw
 
@@ -514,7 +514,7 @@ override sets.
 
 The override set is defined as follows::
 
-    > cat tutorial/saw_offline_ovd.py
+    > cat tutorial/saw_offline_ovd.fig
     
     _offline_root_dir = '/saw/offline/'
     _raw_content_dir = _offline_root_dir + 'raw'
@@ -654,35 +654,35 @@ Our SAW system proved a huge success over time, and over the years we added coun
 Naturally, our config file grew very long.
 
 It now makes sense to have a separate config file for each module in the system. There
-are also common definitions which are used by multiple modules. We create another ``common.py``
+are also common definitions which are used by multiple modules. We create another ``common.fig``
 file for including those.
 
 We replace our existing directory structure::
 
     /systems/config
-    ├── __init__.py
+    ├── __init__.fig
     ├── ...
-    ├── saw.py
+    ├── saw.fig
     └── ...
     
-With this new one (note how ``saw.py`` is replaced with a directory named ``saw``)::
+With this new one (note how ``saw.fig`` is replaced with a directory named ``saw``)::
 
     /systems/config
-    ├── __init__.py
+    ├── __init__.fig
     ├── ...
     ├── saw
-    │   ├── __init__.py
-    │   ├── analyzer.py
-    │   ├── common.py
-    │   ├── searcher.py
-    │   └── writer.py
+    │   ├── __init__.fig
+    │   ├── analyzer.fig
+    │   ├── common.fig
+    │   ├── searcher.fig
+    │   └── writer.fig
     └── ...
 
 
 
-For example, here is what the new ``searcher.py`` looks like (``analyzer.py`` and ``writer.py`` should be obvious)::
+For example, here is what the new ``searcher.fig`` looks like (``analyzer.fig`` and ``writer.fig`` should be obvious)::
 
-    > cat saw/searcher.py
+    > cat saw/searcher.fig
     from .common import saw_module, raw_content_dir
     
     class searcher(saw_module):
@@ -694,9 +694,9 @@ For example, here is what the new ``searcher.py`` looks like (``analyzer.py`` an
         
     __entry_point__ = searcher
 
-While ``common.py`` contains the common defintions::
+While ``common.fig`` contains the common defintions::
 
-    > cat saw/common.py
+    > cat saw/common.fig
     
     root_dir = '/saw/data/'
     raw_content_dir = root_dir + 'raw'

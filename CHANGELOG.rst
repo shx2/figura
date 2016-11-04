@@ -6,13 +6,15 @@ Future/Planned
 
 * "Drivers" for reading figura files using a few languages other than python
 
-* (Experimental) use a different file extension than ".py" for figura files
+1.1.0 (Planned)
+----------------
+* (Experimental) Figura files use ".fig" extension by default, instead of ".py"
 
 1.0.0
 --------
 * Development Status upgraded to Production/Stable -- being used in production for a while now
 
-* Improved double-underscore period-escaping to actually be useful
+* Improved double-underscore dot-escaping to actually be useful
 
 0.10.0
 --------

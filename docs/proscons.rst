@@ -74,7 +74,7 @@ Other Pros and Cons
 * [CON] Setup overhead caused by Python's import mechanism:
 
   - ``PYTHONPATH`` should be set correctly.
-  -  relevant ``__init__.py`` files must be created.
+  -  relevant ``__init__.fig`` files must be created.
 
 * [CON] Syntax awkwardness, caused by using a non-config-minded language (Python) for config purposes.(The syntax might seem awkward at first, but by no means complex. It is really simple, especially for Pythoners.)
 

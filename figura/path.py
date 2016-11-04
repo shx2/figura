@@ -2,6 +2,7 @@
 Definition of `FiguraPath <#figura.path.FiguraPath>`_.
 """
 
+from .settings import get_setting
 from .importutils import is_importable_path
 
 ################################################################################
@@ -59,19 +60,20 @@ class FiguraPath(object):
     
             from figura.path import FiguraPath
         
-        >>> FiguraPath('figura.path.FiguraPath.DELIM').split_parts()
-        ('figura.path', 'FiguraPath.DELIM')
+        >>> FiguraPath('figura.hello_world.greeting.greetee').split_parts()
+        ('figura.hello_world', 'greeting.greetee')
         """
         tokens = self._path.split(self.DELIM)
         n = len(tokens)
         for idx in reversed(range(n + 1)):
             file_path = self.DELIM.join(tokens[:idx])
-            if self._is_file_path(file_path):
+            if self._is_figura_file_path(file_path):
                 break
         return self.DELIM.join(tokens[:idx]), self.DELIM.join(tokens[idx:])
 
-    def _is_file_path(self, path):
-        return is_importable_path(path)
+    def _is_figura_file_path(self, path):
+        fig_ext = get_setting('CONFIG_FILE_EXT')
+        return is_importable_path(path, fig_ext)
     
     #===================================================================================================================
     # operators for FiguraPath manipulation

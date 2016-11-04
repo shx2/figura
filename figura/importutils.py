@@ -3,11 +3,13 @@ Module-importing related tools, used for loading figura config files,
 and inspecting packages containing them.
 """
 
+import os
 import sys
 import six
 import imp
 import importlib
 import pkgutil
+import polyloader
 try:
     # py3
     from importlib.util import find_spec as _find_module
@@ -15,14 +17,25 @@ except ImportError:
     # py2
     from pkgutil import find_loader as _find_module
 
+from .settings import get_setting
 from .errors import ConfigParsingError
+
+################################################################################
+
+def _figura_compile(source_bytes, source_path, fullname):
+    """
+    Just the standard python-file compiler (non-standard stuff might be added in the future).
+    """
+    return compile(source_bytes, source_path, 'exec', dont_inherit = True)
+    
 
 ################################################################################
 
 class NoImportSideEffectsContext(object):
     
-    def __init__(self, remove_from_sys_modules = True):
-        self.remove_from_sys_modules = remove_from_sys_modules
+    def __init__(self, cleanup_import_caches = True):
+        self.cleanup_import_caches = cleanup_import_caches
+        self._backup = {}
     
     def __enter__(self):
 
@@ -32,20 +45,54 @@ class NoImportSideEffectsContext(object):
         self.prev_dont_write_bytecode = sys.dont_write_bytecode
         sys.dont_write_bytecode = True
 
-        if self.remove_from_sys_modules:
+        if self.cleanup_import_caches:
             # remember which modules were already loaded before we run the import.
-            self.oldmods = set(sys.modules.keys())
+            self._backup_dict(sys.modules, 'modules', run_with_empty = False)
+            self._backup_dict(sys.path_importer_cache, 'path_importer_cache', run_with_empty = True)
     
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.remove_from_sys_modules:
+        if self.cleanup_import_caches:
             # remove all modules which got added to sys.modules in this import, to
             # ensure the next time we are here, they get reloaded.
-            newmods = set(sys.modules.keys()) - self.oldmods
-            for newmod in newmods:
-                sys.modules.pop(newmod, None)
+            self._restore_dict(sys.modules, 'modules')
+            self._restore_dict(sys.path_importer_cache, 'path_importer_cache')
 
         sys.dont_write_bytecode = self.prev_dont_write_bytecode
         imp.release_lock()
+    
+    def _backup_dict(self, dct, name, run_with_empty = False):
+        if run_with_empty:
+            self._backup[name] = ( True, dict(dct) )
+            dct.clear()
+        else:
+            self._backup[name] = ( False, set(dct.keys()) )
+    
+    def _restore_dict(self, dct, name):
+        run_with_empty, dct_backup = self._backup.pop(name)
+        if run_with_empty:
+            # restore dict values
+            dct.clear()
+            dct.update(dct_backup)
+        else:
+            # remove newly added keys
+            for newkey in set(dct.keys()) - dct_backup:
+                dct.pop(newkey, None)
+
+class FiguraImportContext(NoImportSideEffectsContext):
+    
+    def __enter__(self):
+        super(FiguraImportContext, self).__enter__()
+        self.should_uninstall = False
+        fig_ext = get_setting('CONFIG_FILE_EXT')
+        if fig_ext != '.py' and not polyloader.is_installed(fig_ext):
+            polyloader.install(_figura_compile, fig_ext)
+            self.should_uninstall = True
+            self.fig_ext = fig_ext
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.should_uninstall:
+            polyloader.uninstall(self.fig_ext)
+        super(FiguraImportContext, self).__exit__(exc_type, exc_val, exc_tb)
 
 ################################################################################
 
@@ -60,7 +107,7 @@ def import_module_no_side_effects(path):
       module in ``sys.modules``). this also applies for modules being imported
       indirectly during the importing of ``path``.
     """
-    with NoImportSideEffectsContext():
+    with FiguraImportContext():
         return _raw_import(path)
 
 def _raw_import(path):
@@ -104,25 +151,46 @@ def import_figura_file(path):
             #raise ConfigParsingError('Failed parsing config "%s"' % path) from e  # not a valid py2 syntax
             six.raise_from(ConfigParsingError('Failed parsing config "%s"' % path), e)
 
-def is_importable_path(path):
+def is_importable_path(path, with_ext = None):
     """
     Does ``path`` point to a module which can be imported?
 
     :param path: a python import path
     """
     try:
-        with NoImportSideEffectsContext():
-            return _find_module(path) is not None
+        with FiguraImportContext():
+            module_spec = _find_module(path)
     except (ImportError, AttributeError):
+        module_spec = None
+    if module_spec is None:
         return False
+    if with_ext is not None:
+        try:
+            # py3
+            filepath = module_spec.origin
+        except AttributeError:
+            try:
+                # py2
+                filepath = module_spec.filename
+            except AttributeError:
+                # py2, but with polyloader
+                filepath = module_spec.path
+        basename = os.path.basename(filepath)
+        if (    not os.path.isdir(filepath) and
+                basename != '__init__.py' and
+                not filepath.endswith('.' + with_ext)):
+            return False
+    return True
 
-def walk_packages(file_path, prefix = ''):
+def walk_packages(file_path, prefix = '', skip_private = True):
     """
     Same as ``pkgutil.walk_packages``, except that it really does work recursively.
     """
     mod = import_figura_file(file_path)
     if hasattr(mod, '__path__'):
         for importer, modname, ispkg in pkgutil.walk_packages(mod.__path__, prefix = prefix):
+            if skip_private and modname.startswith('_'):
+                continue
             yield importer, modname, ispkg
             if ispkg:
                 pref = '%s.%s.' % (prefix, modname) if prefix else '%s.' % (modname,)

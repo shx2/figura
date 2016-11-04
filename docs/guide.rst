@@ -33,7 +33,7 @@ In its most basic form, a figura configuration file is just a python module, whi
 
 ::
 
-    > cat sample_0020_basic.py
+    > cat sample_0020_basic.fig
     greeting = 'Hello, World!'
     display_color = 'green'
     display_font = 'arial'
@@ -63,7 +63,7 @@ Config container can also be nested.
 
 ::
 
-    > cat sample_0030_containers.py
+    > cat sample_0030_containers.fig
     class params1:
         a = 1
         b = 'two'
@@ -113,7 +113,7 @@ This is important for avoiding config/code duplication.
 
 ::
 
-    > cat sample_0040_reusing.py
+    > cat sample_0040_reusing.fig
     _host = 'localhost' # params prefixed by underscore are hidden
     class http_connection:
         host = _host  # using the definition of _host above, instead of re-defining
@@ -159,7 +159,7 @@ Config params and containers defined in other figura files can be imported using
 
 ::
 
-    > cat sample_0050_importing.py
+    > cat sample_0050_importing.fig
     from sample_0020_basic import greeting  # greeting is included in top-level container
     from sample_0020_basic import display_color as _color  # display_color is not included in top-level container
     
@@ -199,7 +199,7 @@ This is done using Python's inheritance syntax.
 
 ::
 
-    > cat sample_0060_extending.py
+    > cat sample_0060_extending.fig
     class debug_logging:
         # logger_name = log_level
         traffic = 'debug'
@@ -260,7 +260,7 @@ Figura treats such cases as overlays.
 
 ::
 
-    > cat sample_0070_overlaying.py
+    > cat sample_0070_overlaying.fig
     class a:
         class b:
             x = 1
@@ -299,7 +299,7 @@ For choosing the overshadow semantics over overlay, use the ``__opaque__=True`` 
 
 ::
 
-    > cat sample_0075_opaque.py
+    > cat sample_0075_opaque.fig
     class a:
         class b:
             x = 1
@@ -349,7 +349,7 @@ override set, you can import it from another module, you can apply another overr
 
 ::
 
-    > cat sample_0080_overrides.py
+    > cat sample_0080_overrides.fig
     __override__ = True
     class my_favorites:  # can be applied to: sample_0050_importing
         color = 'red'  # I don't know what they like, but I love red
@@ -386,7 +386,7 @@ the ``__opaque_override__=True`` metadata directive.
 
 ::
 
-    > cat sample_0083_opaqueoverrides.py
+    > cat sample_0083_opaqueoverrides.fig
     __override__ = True
     class my_favorites:  # can be applied to: sample_0050_importing
         __opaque_override__ = True  # I don't like anything else which might be included in overridee
@@ -505,7 +505,7 @@ Use the ``__entry_point__`` directive for this.
 
 ::
 
-    > cat sample_0100_entry.py
+    > cat sample_0100_entry.fig
     class level_to_skip:
         top_level_param = 'unnested'
         
@@ -543,7 +543,7 @@ in the resulting config container.
 
 ::
 
-    > cat sample_0910_hidden.py
+    > cat sample_0910_hidden.fig
     from sample_0020_basic import greeting as _hidden_greeting
     random_greeting = _hidden_greeting
     _my_private_greeting = 'yo'
@@ -579,7 +579,7 @@ Expressions and Arithmetics
 
 ::
 
-    > cat sample_0930_arithmetics.py
+    > cat sample_0930_arithmetics.fig
     # Say we want to poll A every X seconds, B every 2*X seconds, and C
     # every 8*X seconds.
     # We sometimes change X, and rarely change the ratios between A, B, and C.
@@ -622,7 +622,7 @@ code, this is done using ``os.environ``.
 
 ::
 
-    > cat sample_0940_envvars.py
+    > cat sample_0940_envvars.fig
     from os import environ as _ENV
     contact_email = _ENV.get('EMAIL', 'nobody@nowhere.com')
 
