@@ -7,11 +7,12 @@ from .errors import ConfigError, ConfigParsingError
 from .path import to_figura_path
 from .container import ConfigContainer
 from .parser import ConfigParser
-from .importutils import walk_packages, is_importable_path, FiguraImportContext
+from .importutils import walk_packages, is_importable_path, figura_implocked
 
 ################################################################################
 # convenience functions
 
+@figura_implocked
 def read_config(path, enable_path_spliting = True):
     """
     Flexibly read/process a Figura config file.
@@ -41,37 +42,36 @@ def read_config(path, enable_path_spliting = True):
     1
     """
     
-    with FiguraImportContext():
+    # process the pass, split into file-path and attr-path
+    file_path, attr_path = to_figura_path(path).split_parts()
+    if not file_path:
+        raise ConfigParsingError('No config file found for path: %r' % str(path))
+    if not enable_path_spliting and attr_path:
+        raise ConfigParsingError('No config file found for path: %r. In-file attributes detected: %s' % (
+            str(path), attr_path))
     
-        # process the pass, split into file-path and attr-path
-        file_path, attr_path = to_figura_path(path).split_parts()
-        if not file_path:
-            raise ConfigParsingError('No config file found for path: %r' % str(path))
-        if not enable_path_spliting and attr_path:
-            raise ConfigParsingError('No config file found for path: %r. In-file attributes detected: %s' % (
-                str(path), attr_path))
-        
-        # parse the path:
-        parser = ConfigParser()
-        config = parser.parse(file_path)
+    # parse the path:
+    parser = ConfigParser()
+    config = parser.parse(file_path)
+
+    # support reading all modules under a package, and create a ConfigContainer
+    # reflecting the structure:
+    fig_ext = get_setting('CONFIG_FILE_EXT')
+    for importer, rel_mod_path, ispkg in walk_packages(file_path):
+        mod_path = '%s.%s' % ( file_path, rel_mod_path )
+        if not ispkg and not is_importable_path(mod_path, with_ext = fig_ext):
+            continue
+        cur_config = parser.parse(mod_path)
+        config.deep_setattr(rel_mod_path, cur_config)
     
-        # support reading all modules under a package, and create a ConfigContainer
-        # reflecting the structure:
-        fig_ext = get_setting('CONFIG_FILE_EXT')
-        for importer, rel_mod_path, ispkg in walk_packages(file_path):
-            mod_path = '%s.%s' % ( file_path, rel_mod_path )
-            if not ispkg and not is_importable_path(mod_path, with_ext = fig_ext):
-                continue
-            cur_config = parser.parse(mod_path)
-            config.deep_setattr(rel_mod_path, cur_config)
-        
-        # apply the attr-path:
-        if attr_path:
-            config = config.deep_getattr(attr_path)
-    
-        return config
+    # apply the attr-path:
+    if attr_path:
+        config = config.deep_getattr(attr_path)
+
+    return config
 
 
+@figura_implocked
 def build_config(*paths, **kwargs):
     """
     Build a configuration by reading Figura configs and optional

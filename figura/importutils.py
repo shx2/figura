@@ -6,6 +6,7 @@ and inspecting packages containing them.
 import os
 import sys
 import six
+import functools
 import imp
 import importlib
 import pkgutil
@@ -22,29 +23,17 @@ from .errors import ConfigParsingError
 
 ################################################################################
 
-def _figura_compile(source_bytes, source_path, fullname):
-    """
-    Just the standard python-file compiler (non-standard stuff might be added in the future).
-    """
-    return compile(source_bytes, source_path, 'exec', dont_inherit = True)
-    
-
-################################################################################
-
-class NoImportSideEffectsContext(object):
+class _NoImportSideEffectsContext(object):
     
     def __init__(self, cleanup_import_caches = True):
         self.cleanup_import_caches = cleanup_import_caches
         self._backup = {}
     
     def __enter__(self):
-
-        imp.acquire_lock()
-
         # suppress writing of .pyc files:
         self.prev_dont_write_bytecode = sys.dont_write_bytecode
         sys.dont_write_bytecode = True
-
+        
         if self.cleanup_import_caches:
             # remember which modules were already loaded before we run the import.
             self._backup_dict(sys.modules, 'modules', run_with_empty = False)
@@ -58,7 +47,6 @@ class NoImportSideEffectsContext(object):
             self._restore_dict(sys.path_importer_cache, 'path_importer_cache')
 
         sys.dont_write_bytecode = self.prev_dont_write_bytecode
-        imp.release_lock()
     
     def _backup_dict(self, dct, name, run_with_empty = False):
         if run_with_empty:
@@ -78,10 +66,10 @@ class NoImportSideEffectsContext(object):
             for newkey in set(dct.keys()) - dct_backup:
                 dct.pop(newkey, None)
 
-class FiguraImportContext(NoImportSideEffectsContext):
+class _FiguraImportContext(_NoImportSideEffectsContext):
     
     def __enter__(self):
-        super(FiguraImportContext, self).__enter__()
+        super(_FiguraImportContext, self).__enter__()
         self.should_uninstall = False
         fig_ext = get_setting('CONFIG_FILE_EXT')
         if fig_ext != '.py' and not polyloader.is_installed(fig_ext):
@@ -92,11 +80,38 @@ class FiguraImportContext(NoImportSideEffectsContext):
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.should_uninstall:
             polyloader.uninstall(self.fig_ext)
-        super(FiguraImportContext, self).__exit__(exc_type, exc_val, exc_tb)
+        super(_FiguraImportContext, self).__exit__(exc_type, exc_val, exc_tb)
+
+
+class _ImpLock(object):
+    def acquire(self):
+        imp.acquire_lock()
+    def release(self):
+        imp.release_lock()
+    def __enter__(self):
+        self.acquire()
+    def __exit__(self, *a, **kw):
+        self.release()
+
+_implock = _ImpLock()
+
+def figura_implocked(func):
+    @functools.wraps(func)
+    def f(*a, **kw):
+        with _implock:
+            with _FiguraImportContext():
+                return func(*a, **kw)
+    return f
+
+def _figura_compile(source_bytes, source_path, fullname):
+    """
+    Just the standard python-file compiler (non-standard stuff might be added in the future).
+    """
+    return compile(source_bytes, source_path, 'exec', dont_inherit = True)
 
 ################################################################################
 
-def import_module_no_side_effects(path):
+def _import_module_no_side_effects(path):
     """
     Similar to ``importlib.import_module(path)``, but with a few differences:
     
@@ -107,8 +122,7 @@ def import_module_no_side_effects(path):
       module in ``sys.modules``). this also applies for modules being imported
       indirectly during the importing of ``path``.
     """
-    with FiguraImportContext():
-        return _raw_import(path)
+    return _raw_import(path)
 
 def _raw_import(path):
     # First, invalidate caches!
@@ -132,6 +146,7 @@ def _raw_import(path):
     # Now can safely import the module
     return importlib.import_module(path)
 
+@figura_implocked
 def import_figura_file(path):
     """
     Import a figura config file (with no side affects).
@@ -141,7 +156,7 @@ def import_figura_file(path):
     :raise ConfigParsingError: if importing fails
     """
     try:
-        return import_module_no_side_effects(path)
+        return _import_module_no_side_effects(path)
     except Exception as e:
         if six.PY2:
             # no exception chaining in python2
@@ -151,6 +166,7 @@ def import_figura_file(path):
             #raise ConfigParsingError('Failed parsing config "%s"' % path) from e  # not a valid py2 syntax
             six.raise_from(ConfigParsingError('Failed parsing config "%s"' % path), e)
 
+@figura_implocked
 def is_importable_path(path, with_ext = None):
     """
     Does ``path`` point to a module which can be imported?
@@ -158,8 +174,7 @@ def is_importable_path(path, with_ext = None):
     :param path: a python import path
     """
     try:
-        with FiguraImportContext():
-            module_spec = _find_module(path)
+        module_spec = _find_module(path)
     except (ImportError, AttributeError):
         module_spec = None
     if module_spec is None:
@@ -182,6 +197,7 @@ def is_importable_path(path, with_ext = None):
             return False
     return True
 
+@figura_implocked
 def walk_packages(file_path, prefix = '', skip_private = True):
     """
     Same as ``pkgutil.walk_packages``, except that it really does work recursively.
