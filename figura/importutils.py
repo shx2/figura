@@ -204,7 +204,21 @@ def walk_packages(file_path, prefix = '', skip_private = True):
     """
     mod = import_figura_file(file_path)
     if hasattr(mod, '__path__'):
-        for importer, modname, ispkg in pkgutil.walk_packages(mod.__path__, prefix = prefix):
+        
+        # *PREFIX HACK*: for some reason, if we pass an empty prefix, walk_packages() can
+        # yield packages not under the path we provide (this is probably a bug in walk_packages()).
+        # E.g. if there's a "test" package under the __path__ passed, it can yield python's own
+        # "test" package (e.g. (FileFinder('/usr/lib/python3.4/test'), 'test.pystone', False))
+        # To bypass this bug, we make sure to always pass a non-empty prefix (and strip it back later).
+        DUMMY_PREFIX = 'FIGURA___DUMMY___PREFIX.'
+        tmp_prefix = DUMMY_PREFIX + prefix
+        
+        for importer, modname, ispkg in pkgutil.walk_packages(mod.__path__, prefix = tmp_prefix):
+
+            # *PREFIX HACK* (continued)
+            assert modname.startswith(DUMMY_PREFIX), modname
+            modname = modname[len(DUMMY_PREFIX):]
+
             if skip_private and modname.startswith('_'):
                 continue
             yield importer, modname, ispkg
