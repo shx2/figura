@@ -10,7 +10,7 @@ import functools
 import imp
 import importlib
 import pkgutil
-import polyloader
+import figura.polyloader as polyloader  # TODO: figura.polyloader -> polyloader
 try:
     # py3
     from importlib.util import find_spec as _find_module
