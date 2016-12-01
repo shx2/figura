@@ -78,6 +78,20 @@ Also, the directory (and subdirectories) containing Figura files must contain
 a ``__init__.fig`` file. This is required for the same reason --
 to make the modules python-importable.
 
+File Extension
+---------------------
+
+In Figura V1.x.x, we use by defualt the standard python ".py" file extension for Figura
+config files.  In V1.1.0 support was added for using other file extensions, in order to
+distinguish python scripts and modules from Figura config files.
+
+In Figura version 2 (not yet released) the default extension will be ".fig".  Users using
+Figura version>=1.1.0 are encouraged to use Figura in a forward-compatible way, by switching
+the extension explicitly to ".fig". This is done by running::
+
+    # Run this once, before reading any figura files:
+    from figura.settings import set_extension_fig; set_extension_fig()
+
 
 Documentation
 ==================================
