@@ -8,6 +8,12 @@ from figura import read_config, ConfigContainer, ConfigOverrideSet
 
 ################################################################################
 
+# Tests use ".fig" extension. Enable it:
+from figura.settings import set_extension_fig as _setfig
+_setfig()
+
+################################################################################
+
 class BasicTest(unittest.TestCase):
 
     def test_period_attr_access(self):

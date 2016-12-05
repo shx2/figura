@@ -7,6 +7,12 @@ from figura import read_config
 
 ################################################################################
 
+# Tests use ".fig" extension. Enable it:
+from figura.settings import set_extension_fig as _setfig
+_setfig()
+
+################################################################################
+
 class BasicTest(unittest.TestCase):
 
     #===================================================================================================================

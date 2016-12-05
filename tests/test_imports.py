@@ -15,6 +15,10 @@ from figura.settings import get_setting, set_setting
 
 ################################################################################
 
+# Tests use ".fig" extension. Enable it:
+from figura.settings import set_extension_fig as _setfig
+_setfig()
+
 TEMPDIR_NAME = 'figura_%s'% os.getpid()
 TEMPDIR = os.path.join(tempfile.gettempdir(), TEMPDIR_NAME)
 BASEDIR = os.path.dirname(__file__)

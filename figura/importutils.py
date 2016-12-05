@@ -186,14 +186,11 @@ def is_importable_path(path, with_ext = None):
         except AttributeError:
             try:
                 # py2
-                filepath = module_spec.filename
+                filepath = module_spec.get_filename()
             except AttributeError:
                 # py2, but with polyloader
                 filepath = module_spec.path
-        basename = os.path.basename(filepath)
-        if (    not os.path.isdir(filepath) and
-                basename != '__init__.py' and
-                not filepath.endswith('.' + with_ext)):
+        if not filepath.endswith('.' + with_ext):
             return False
     return True
 
