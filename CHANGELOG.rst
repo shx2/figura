@@ -6,6 +6,10 @@ Future/Planned
 
 * "Drivers" for reading figura files using a few languages other than python
 
+1.2.1
+----------------
+* Bug fixes
+
 1.2.0
 ----------------
 * ".py" is now the default extension again (but using ".fig" is encouraged)
