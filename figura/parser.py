@@ -15,11 +15,12 @@ from .importutils import import_figura_file
 ################################################################################
 # Constants and definitions
 
-VALID_VALUE_TYPES = set([ type(None), type(''), type(u''), type(True), type(0), type(0.0), type(()), type([]), type({}) ])
+VALID_ATOMIC_VALUE_TYPES = set([ type(None), type(''), type(u''), type(True), type(0), type(0.0) ])
+VALID_SEQUENCE_VALUE_TYPES = set([ type(()), type([]), type({}) ])
 
 def _add_type_of_exp(exp):
     try:
-        VALID_VALUE_TYPES.add(type(eval(exp)))
+        VALID_ATOMIC_VALUE_TYPES.add(type(eval(exp)))
     except SyntaxError:
         pass
 
@@ -46,8 +47,11 @@ class ConfigParser(object):
         
     """
     
-    VALID_VALUE_TYPES = VALID_VALUE_TYPES
-    """ A list of types allowed as config values """
+    VALID_ATOMIC_VALUE_TYPES = VALID_ATOMIC_VALUE_TYPES
+    """ A list of atomic types allowed as config values """
+    
+    VALID_SEQUENCE_VALUE_TYPES = VALID_SEQUENCE_VALUE_TYPES
+    """ A list of sequence types allowed as config values """
     
     META_MAP = META_MAP
     """
@@ -94,8 +98,14 @@ class ConfigParser(object):
         """
         
         # If this is an atomic type, no parsing is required
-        if type(x) in self.VALID_VALUE_TYPES:
+        if type(x) in self.VALID_ATOMIC_VALUE_TYPES:
             return x
+        elif type(x) in self.VALID_SEQUENCE_VALUE_TYPES:
+            # a sequence. apply to elements recursively
+            if hasattr(x, 'items'):
+                return type(x)( (k, self._python_to_conf(v)) for k, v in x.items() )
+            else:
+                return type(x)( self._python_to_conf(elem) for elem in x )
         
         if type(x) == type(inspect):
             

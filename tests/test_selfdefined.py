@@ -70,6 +70,9 @@ class BasicTest(unittest.TestCase):
         # verify
         test_output = data.deep_getattr(test.verify.entry_point)
         self.assertConfigEqual(test_input, test_output, test.name)
+        
+        # sanity: verify output is json-serializable
+        test_output.to_json()
 
     def parse(self, path):
         # load the figura file

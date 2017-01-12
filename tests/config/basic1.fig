@@ -21,6 +21,13 @@ class test_identity:
     class verify:
         entry_point = 'some_params'
 
+class test_nesting_in_container:
+    is_unittest = True
+    class construct:
+        entry_point = 'container_nest'
+    class verify:
+        entry_point = 'container_nest_RESULT'
+
 ################################################################
 # Unittest data
 
@@ -42,5 +49,21 @@ class RESULT:
     c = [3,4]
     class nested:
         d = 'five'
+
+################################################################
+
+class _foo:
+    a = 1
+    b = 2
+
+_foo_dict = {'a':1, 'b':2}
+
+class container_nest:
+    foos1 = [ _foo, _foo, 2, _foo ]
+    foos2 = { 0: _foo, 1: _foo, 2: 2, 333: _foo }
+
+class container_nest_RESULT:
+    foos1 = [ _foo_dict, _foo_dict, 2, _foo_dict]
+    foos2 = { 0: _foo_dict, 1: _foo_dict, 2: 2, 333: _foo_dict }
 
 ################################################################

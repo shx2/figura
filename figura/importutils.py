@@ -3,7 +3,6 @@ Module-importing related tools, used for loading figura config files,
 and inspecting packages containing them.
 """
 
-import os
 import sys
 import six
 import functools
