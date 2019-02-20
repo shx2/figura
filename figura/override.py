@@ -5,8 +5,8 @@ Definitions and tools of override-set-related and config-overriding-related oper
 from .container import ConfigContainer
 from .errors import ConfigError
 from .misc import deep_getattr, deep_setattr
-   
-    
+
+
 ################################################################################
 
 class ConfigOverrideSet(ConfigContainer):
@@ -14,7 +14,7 @@ class ConfigOverrideSet(ConfigContainer):
     A ConfigContainer representing an override-set, which can be applied to
     other config containers.
     """
-    
+
     def __init__(self, *args, **kwargs):
         super(ConfigOverrideSet, self).__init__(*args, **kwargs)
         self.get_metadata().is_override_set = True
@@ -24,7 +24,7 @@ class ConfigOverrideSet(ConfigContainer):
 def apply_overrides_to_config(container, overrides, callback_key_prefix = '', enforce_override_set = True, **kwargs):
     """
     Apply overrides from an override-set to a container (in-place).
-    
+
     :param container: a ``ConfigContainer`` to modify in-place
     :param overrides: a ``ConfigContainer`` containing the overrides to apply
     :param enforce_override_set: if ``enforce_override_set`` is set, raises an
@@ -35,10 +35,10 @@ def apply_overrides_to_config(container, overrides, callback_key_prefix = '', en
     :raise ConfigError: if ``enforce_override_set`` and ``overrides`` isn't an
         override set.
     """
-    
+
     if enforce_override_set and not overrides.get_metadata().is_override_set:
         raise ConfigError('Attempting to apply overrides while is_override_set=False')
-    
+
     for key, value in overrides.items():
         applied = False
 
@@ -48,7 +48,7 @@ def apply_overrides_to_config(container, overrides, callback_key_prefix = '', en
         if (isinstance(old_value, ConfigContainer) and
             isinstance(value, ConfigContainer) and
             not value.get_metadata().is_opaque_override):
-            
+
             # old_value and value are both containers -- a nested override, apply recursively
             nested_container = container[key]
             cur_key_prefix = '%s.' % ( key, )
@@ -81,7 +81,7 @@ def apply_override(
     Apply an override (key=value pair) to the given container in-place.
     The key can indicate override of a nested param, by including dots
     (or the alternative double-underscore form). E.g.: ``A.B.x``, or ``A__B__x``.
-    
+
     :param container: a ConfigContainer to modify in place
     :param key: the attribute (or attr-path) to set
     :param value: the new attribute value
@@ -90,7 +90,7 @@ def apply_override(
         old_value.
     :param callback_missing_value: the value to pass as old_value, in case the param
         was not previously set.
-        
+
     """
     if callback is not None:
         old_value = deep_getattr(
@@ -107,7 +107,7 @@ def apply_override(
 
 def normalize_override_key(key):
     """
-    .. testsetup:: 
+    .. testsetup::
 
         from figura.override import normalize_override_key
 

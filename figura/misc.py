@@ -13,24 +13,24 @@ def merge_dicts(*args, **kwargs):
     Merge dictionaries. Values in later args override former with the same key.
     kwargs always override.
 
-    .. testsetup:: 
+    .. testsetup::
 
        from figura.misc import merge_dicts
-    
+
     >>> sorted(merge_dicts({'a':1, 'b':2}, {'b':22, 'c':33, 'd':44}, d=444).items())
     [('a', 1), ('b', 22), ('c', 33), ('d', 444)]
-     
+
     """
     if not args:
         args = ( {}, )
     d = copy.copy(args[0])
     for arg in args[1:]:
-        
+
         # order-perserving: if type(arg)==OrderedDict, we assume the
         # caller wants to preserve the order of the items in the ordered dict
         if isinstance(arg, OrderedDict) and not isinstance(d, OrderedDict):
             d = OrderedDict(d)  # preserve order from now on
-        
+
         d.update(arg)
 
     d.update(kwargs)
@@ -40,7 +40,7 @@ class Struct(dict):
     """
     A struct-like object. Can be thought of as a dict which also allows
     accessing its items using attribute-access::
-    
+
         > x = Struct(a=3, b='bbb')
         > x
         {'a': 3, 'b': 'bbb'}
@@ -53,7 +53,7 @@ class Struct(dict):
         AttributeError: 'Struct' object has no attribute 'c'
         > x.c = 5
         > x.c
-        5    
+        5
     """
 
     # a simpler implementation would use:
@@ -66,13 +66,13 @@ class Struct(dict):
             return self[k]
         except KeyError:
             raise AttributeError(k)
-    
+
     def __setattr__(self, k, v):
-        self[k] = v        
-    
+        self[k] = v
+
     def __delattr__(self, k):
-        del self[k]        
-    
+        del self[k]
+
     def __dir__(self):
         return dir({}) + list(self.keys())
 

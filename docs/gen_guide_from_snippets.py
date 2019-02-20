@@ -12,17 +12,17 @@ try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-    
+
 ###############################################################################
 # functions
 
 def process_part(guide_dir, part):
-    
+
     figura_dir = os.path.normpath(os.path.join(guide_dir, '..', '..'))
     figura_print = os.path.join(figura_dir, 'figura', 'tools', 'figura_print.py')
     pythonpath = ':'.join([ figura_dir, guide_dir ])
     fig_ext = 'fig'
-    
+
     OUT = StringIO()
 
     def echo(*args, **kwargs):
@@ -33,7 +33,7 @@ def process_part(guide_dir, part):
         if os.path.exists(path):
             with open(path) as F:
                 echo(F.read() + '\n')
-    
+
     ############################
     # pre
     ############################
@@ -74,7 +74,7 @@ def process_part(guide_dir, part):
             # path in the figura_print var we have:
             if 'figura_print' in cmd.split():
                 cmd = re.sub('figura_print', figura_print, cmd)
-            
+
             is_real_cmd = cmd.lower() != 'pass'
             if is_real_cmd:
                 echo('%s::' % msg)
@@ -90,9 +90,9 @@ def process_part(guide_dir, part):
     # post
     ############################
     add_raw('post')
-    
+
     return OUT.getvalue()
-    
+
 def indent_lines(indent, multiline_string):
     return '\n'.join( indent + line for line in multiline_string.splitlines() )
 
@@ -100,24 +100,24 @@ def run_cmd(cmd, pythonpath):
     full_cmd = 'PYTHONPATH=%s %s' % (pythonpath, cmd)
     #print(full_cmd)
     out = subprocess.check_output(full_cmd, shell=True)
-    return out.decode("utf-8") 
-    
+    return out.decode("utf-8")
+
 
 ###############################################################################
 # MAIN
 
 def main():
-    
+
     args = getopt()
     guide_type, = args.guide_type
-    
+
     # figure out locations, and add to sys.path
     here = os.path.dirname(os.path.abspath(__file__))
     guide_dir = os.path.join(here, guide_type)
     output_file = args.output_file
     if not output_file:
         output_file = os.path.join(here, '%s.rst' % guide_type)
-    
+
     # find files to process:
     part_names = sorted(set(
         f.split('.')[0]
@@ -133,10 +133,10 @@ def main():
 
 def getopt():
     parser = argparse.ArgumentParser()
-    
+
     parser.add_argument('guide_type', nargs = 1)
     parser.add_argument('-o', '--output-file', help = 'defaults to "<guide_type>.rst"')
-    
+
     return parser.parse_args()
 
 ###############################################################################

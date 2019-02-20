@@ -22,7 +22,7 @@ class BasicTest(unittest.TestCase):
         self.assertIn('x.y', c)
         self.assertNotIn('x', c)
         self.assertEqual(c['x.y'], 5)
-    
+
     def test_period_escaping_override(self):
         c = ConfigContainer.from_dict({'a': {'b': {}}})
         ov = ConfigOverrideSet.from_dict({'x__y': 5})
@@ -35,7 +35,7 @@ class BasicTest(unittest.TestCase):
         self.assertIn('xx.yy', c.a.b)
         self.assertNotIn('xx', c.a.b)
         self.assertEqual(c.a.b['xx.yy'], 55)
-        
+
     def test_period_escaping_config_file(self):
         c = read_config('figura.tests.config.escape')
         self.assertIn('a.b', c)

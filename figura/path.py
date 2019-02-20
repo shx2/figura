@@ -13,14 +13,14 @@ class FiguraPath(object):
     The path contains two (optional) parts: the file-path, which is a python-import
     path (e.g. figura.tests), and a (deep) attribute-path to point to a specific
     value inside the file.
-    
+
     The two parts are concatenated together with the same delimiter used by each
     of the parts, thus one cannot immediately tell
-    
+
     E.g.: a path representing "the value of ``A.B.b`` inside the config file ``figura.tests.config.override``,
     is written like: ``figura.tests.config.override.A.B.b``.
     """
-    
+
     DELIM = '.'
     """
     The delimiter used for all purposes: inside the file-path, between file-path
@@ -28,10 +28,10 @@ class FiguraPath(object):
     """
 
     #===================================================================================================================
-    
+
     def __init__(self, path):
         self._path = self._normalize_other(path)
-    
+
     #===================================================================================================================
     # Path-parts handling
     #===================================================================================================================
@@ -40,7 +40,7 @@ class FiguraPath(object):
     def from_parts(cls, file_path, attr_path = None):
         """
         Construct a FiguraPath object from its two parts.
-        
+
         :param file_path: a python import-path. E.g. ``figura.tests.config.override``
         :param attr_path: a (deep) attribute inside the file. E.g. ``A.B.b``
         """
@@ -53,13 +53,13 @@ class FiguraPath(object):
         Note this method looks for python modules in the filesystem to
         determine what prefix of the FiguraPath is a valid file-path. The
         rest is considered the attr-path.
-        
+
         :return: a 2-tuple of (file_path, attr_path)
-        
-        .. testsetup:: 
-    
+
+        .. testsetup::
+
             from figura.path import FiguraPath
-        
+
         >>> FiguraPath('figura.hello_world.greeting.greetee').split_parts()
         ('figura.hello_world', 'greeting.greetee')
         """
@@ -74,7 +74,7 @@ class FiguraPath(object):
     def _is_figura_file_path(self, path):
         fig_ext = get_setting('CONFIG_FILE_EXT')
         return is_importable_path(path, fig_ext)
-    
+
     #===================================================================================================================
     # operators for FiguraPath manipulation
     #===================================================================================================================
@@ -84,10 +84,10 @@ class FiguraPath(object):
         Add a string to the end of the path.
         :note: this follows string semantics. No implicit delimiter is added.
 
-        .. testsetup:: 
-    
+        .. testsetup::
+
             from figura.path import FiguraPath
-        
+
         >>> FiguraPath('abc') + 'd'
         FiguraPath('abcd')
         """
@@ -98,10 +98,10 @@ class FiguraPath(object):
         """
         The FiguraPath equivalent of string formatting.
 
-        .. testsetup:: 
-    
+        .. testsetup::
+
             from figura.path import FiguraPath
-        
+
         >>> FiguraPath('foo.%s.bar') % 'baz'
         FiguraPath('foo.baz.bar')
         """
@@ -113,10 +113,10 @@ class FiguraPath(object):
         """
         The parent path, one level up.
 
-        .. testsetup:: 
-    
+        .. testsetup::
+
             from figura.path import FiguraPath
-        
+
         >>> FiguraPath('a.bb.ccc').parent
         FiguraPath('a.bb')
         >>> FiguraPath('a').parent is None
@@ -127,14 +127,14 @@ class FiguraPath(object):
             return FiguraPath(path)
         else:
             return None
-    
+
     @property
     def basename(self):
         """
         The basename of the path.
-        
-        .. testsetup:: 
-    
+
+        .. testsetup::
+
             from figura.path import FiguraPath
 
         >>> FiguraPath('a.b').basename
@@ -145,14 +145,14 @@ class FiguraPath(object):
             return x
         else:
             return None
-    
+
     def _normalize_other(self, other):
         try:
             return other._path
         except AttributeError:
             pass
         return other
-    
+
     def _like_self(self, other):
         return type(self)(other)
 
@@ -162,22 +162,22 @@ class FiguraPath(object):
 
     def __repr__(self):
         return '%s(%r)' % ( type(self).__name__, self._path )
-    
+
     def __str__(self):
         return self._path
-    
+
     def __hash__(self):
         return hash(( type(self), str(self) ))
-    
+
     def __eq__(self, other):
         try:
             return self._path == other._path
         except AttributeError:
             return NotImplemented
-    
+
     def __ne__(self, other):
         return not (self == other)
-    
+
     def __nonzero__(self):
         return bool(self._path)
 
@@ -186,10 +186,10 @@ def to_figura_path(path):
     """
     Convert values of different types to a FiguraPath.
 
-    .. testsetup:: 
+    .. testsetup::
 
         from figura.path import FiguraPath, to_figura_path
-    
+
     >>> to_figura_path('a.b.c')
     FiguraPath('a.b.c')
     >>> to_figura_path(FiguraPath('a.b.c'))

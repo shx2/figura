@@ -23,21 +23,21 @@ from .errors import ConfigParsingError
 ################################################################################
 
 class _NoImportSideEffectsContext(object):
-    
+
     def __init__(self, cleanup_import_caches = True):
         self.cleanup_import_caches = cleanup_import_caches
         self._backup = {}
-    
+
     def __enter__(self):
         # suppress writing of .pyc files:
         self.prev_dont_write_bytecode = sys.dont_write_bytecode
         sys.dont_write_bytecode = True
-        
+
         if self.cleanup_import_caches:
             # remember which modules were already loaded before we run the import.
             self._backup_dict(sys.modules, 'modules', run_with_empty = False)
             self._backup_dict(sys.path_importer_cache, 'path_importer_cache', run_with_empty = True)
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.cleanup_import_caches:
             # remove all modules which got added to sys.modules in this import, to
@@ -46,14 +46,14 @@ class _NoImportSideEffectsContext(object):
             self._restore_dict(sys.path_importer_cache, 'path_importer_cache')
 
         sys.dont_write_bytecode = self.prev_dont_write_bytecode
-    
+
     def _backup_dict(self, dct, name, run_with_empty = False):
         if run_with_empty:
             self._backup[name] = ( True, dict(dct) )
             dct.clear()
         else:
             self._backup[name] = ( False, set(dct.keys()) )
-    
+
     def _restore_dict(self, dct, name):
         run_with_empty, dct_backup = self._backup.pop(name)
         if run_with_empty:
@@ -66,7 +66,7 @@ class _NoImportSideEffectsContext(object):
                 dct.pop(newkey, None)
 
 class _FiguraImportContext(_NoImportSideEffectsContext):
-    
+
     def __enter__(self):
         super(_FiguraImportContext, self).__enter__()
         self.should_uninstall = False
@@ -113,7 +113,7 @@ def _figura_compile(source_bytes, source_path, fullname):
 def _import_module_no_side_effects(path):
     """
     Similar to ``importlib.import_module(path)``, but with a few differences:
-    
+
     - ``*.pyc`` files are not created as part of importing
     - the module imported isn't added to ``sys.modules``
     - calling this function multiple times with the same value will actually
@@ -149,7 +149,7 @@ def _raw_import(path):
 def import_figura_file(path):
     """
     Import a figura config file (with no side affects).
-    
+
     :param path: a python import path
     :return: a python module object
     :raise ConfigParsingError: if importing fails
@@ -200,7 +200,7 @@ def walk_packages(file_path, prefix = '', skip_private = True):
     """
     mod = import_figura_file(file_path)
     if hasattr(mod, '__path__'):
-        
+
         # *PREFIX HACK*: for some reason, if we pass an empty prefix, walk_packages() can
         # yield packages not under the path we provide (this is probably a bug in walk_packages()).
         # E.g. if there's a "test" package under the __path__ passed, it can yield python's own
@@ -208,7 +208,7 @@ def walk_packages(file_path, prefix = '', skip_private = True):
         # To bypass this bug, we make sure to always pass a non-empty prefix (and strip it back later).
         DUMMY_PREFIX = 'FIGURA___DUMMY___PREFIX.'
         tmp_prefix = DUMMY_PREFIX + prefix
-        
+
         for importer, modname, ispkg in pkgutil.walk_packages(mod.__path__, prefix = tmp_prefix):
 
             # *PREFIX HACK* (continued)

@@ -21,7 +21,7 @@ Example::
     config = read_config(args.config[0])
     config.apply_overrides(args.override)
     print(config)
-    
+
 Another example, leveraging `build_config <#figura.cli.build_config_from_cli>`__::
 
     import argparse
@@ -62,7 +62,7 @@ def add_override_argument(parser, *names, **kwargs):
         code using them is responsible for converting them to other types
         as needed. Some convenience functions are provided for this purpose
         (e.g. boolify_).
-    
+
     :param parser: an ArgumentParser object.
     :param names: The `names` args to be passed on to `parser.add_argument`.
         Defaults to `DEFAULT_OVERRIDE_OPTION_NAMES`.
@@ -131,10 +131,10 @@ OPTION_VALUE_ESCAPE_CHAR = '@'
 
 def escape_list_value(value):
     """
-    .. testsetup:: 
-    
+    .. testsetup::
+
        from figura.cli import escape_list_value
-       
+
     >>> escape_list_value('a')
     'a'
     >>> escape_list_value('a,b')
@@ -148,10 +148,10 @@ def escape_list_value(value):
 
 def split_list_value(value, delim = ','):
     """
-    .. testsetup:: 
-    
+    .. testsetup::
+
        from figura.cli import split_list_value
-       
+
     >>> split_list_value('a,b,c')
     ['a', 'b', 'c']
     >>> split_list_value('a@,b@,c')
@@ -213,14 +213,14 @@ _BOOLIFY_DICT = {
 def boolify(x):
     """
     Try to guess what boolean value ``x`` represents.
-    
+
     :param x: could be a bool, string ("true", "yes", etc.), int (0 or 1)
     :raise ValueError: if can't determine bool-value from ``x``
 
-    .. testsetup:: 
-    
+    .. testsetup::
+
        from figura.cli import boolify
-    
+
     >>> boolify(True)
     True
     >>> boolify(False)
@@ -233,7 +233,7 @@ def boolify(x):
     True
     >>> boolify(0)
     False
-    
+
     """
     if isinstance(x, six.string_types):
         x = x.lower()

@@ -34,11 +34,11 @@ def set_extension_fig():
     """
     Use this for forward-compatibility.  This enables the ".fig" extension
     (which will be the default in V2) while using Figura V1.
-    
+
     Use like::
-    
+
         from figura.settings import set_extension_fig; set_extension_fig()
-     
+
     """
     return set_setting('CONFIG_FILE_EXT', 'fig')
 
