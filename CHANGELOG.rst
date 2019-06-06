@@ -6,6 +6,10 @@ Future/Planned
 
 * "Drivers" for reading figura files using a few languages other than python
 
+1.2.2
+----------------
+* Bug fixes
+
 1.2.1
 ----------------
 * Bug fixes
