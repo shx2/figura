@@ -219,7 +219,9 @@ def walk_packages(file_path, prefix = '', skip_private = True):
                 continue
             yield importer, modname, ispkg
             if ispkg:
-                pref = '%s.%s.' % (prefix, modname) if prefix else '%s.' % (modname,)
+                if prefix and modname.startswith(prefix):
+                    modname = modname[len(prefix):]
+                pref = '%s%s.' % (prefix, modname) if prefix else '%s.' % (modname,)
                 for x in walk_packages('%s.%s' % (file_path, modname), prefix = pref):
                     yield x
 
