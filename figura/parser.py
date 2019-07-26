@@ -120,11 +120,7 @@ class ConfigParser(object):
 
         elif _is_raw_container(x):
             # a class --> a ConfigContainer
-            mro_dicts = [
-                self._get_dunder_dict(t)
-                for t in reversed(inspect.getmro(x))
-            ]
-            raw_attrs = merge_dicts(*mro_dicts)
+            raw_attrs = self._get_dunder_dict(x)
 
             # handle auto-overlay magic
             if nesting_context is None:
@@ -169,15 +165,14 @@ class ConfigParser(object):
         if x == object:
             # result of the mro call:
             return {}
+        if not deep:
+            return dict(x.__dict__)
         objs = [ x ]
-        if deep:
-            try:
-                objs.extend(inspect.getmro(x)[1:])
-            except AttributeError:
-                pass
-            dicts = [ self._get_dunder_dict(obj, deep = False) for obj in objs ]
-        else:
-            dicts = [ dict(x.__dict__) ]
+        try:
+            objs.extend(inspect.getmro(x)[1:])
+        except AttributeError:
+            pass
+        dicts = [ self._get_dunder_dict(obj, deep = False) for obj in objs ]
         d = merge_dicts(*reversed(dicts))
         return d
     

@@ -2,7 +2,6 @@
 Generally useful functions and classes used in this package.
 """
 
-import copy
 from collections import OrderedDict
 
 ################################################################################
@@ -23,7 +22,7 @@ def merge_dicts(*args, **kwargs):
     """
     if not args:
         args = ( {}, )
-    d = copy.copy(args[0])
+    d = args[0].copy()
     for arg in args[1:]:
         
         # order-perserving: if type(arg)==OrderedDict, we assume the

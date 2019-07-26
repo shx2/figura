@@ -133,15 +133,21 @@ class ConfigContainer(Struct, ConfigContainerMixin):
     )
     
     def __init__(self, *args, **kwargs):
-        metadata = kwargs.pop('metadata', self.DEFAULT_METADATA)
+        metadata = kwargs.pop('metadata', None)
         super(ConfigContainer, self).__init__(*args, **kwargs)
         # not doing self._metadata=x because that results with self['_metadata']=x,
         # i.e. adding a new key to the container
-        self.__dict__['_metadata'] = Struct(merge_dicts(self.DEFAULT_METADATA, metadata))
-        
+        if metadata is not None:
+            metadata = merge_dicts(self.DEFAULT_METADATA, metadata)
+        else:
+            metadata = Struct(self.DEFAULT_METADATA)
+        self.__dict__['_metadata'] = metadata
+
     def get_metadata(self):
         return self._metadata
 
+    def copy(self):
+        return type(self)(self)
 
 ################################################################################
 
