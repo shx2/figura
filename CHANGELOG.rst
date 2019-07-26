@@ -1,10 +1,6 @@
-Future/Planned
+1.2.3
 ----------------
-* Type coercion when applying (cli) overrides
-
-* Support specifying config files by file path (as opposed to import path)
-
-* "Drivers" for reading figura files using a few languages other than python
+* Speed improvements
 
 1.2.2
 ----------------
@@ -60,3 +56,11 @@ Future/Planned
 0.9.0
 -----
 * Initial release
+
+Future/Planned
+----------------
+* Type coercion when applying (cli) overrides
+
+* Support specifying config files by file path (as opposed to import path)
+
+* "Drivers" for reading figura files using a few languages other than python
