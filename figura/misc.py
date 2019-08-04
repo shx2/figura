@@ -72,6 +72,9 @@ class Struct(dict):
     def __delattr__(self, k):
         del self[k]        
     
+    def copy(self):
+        return type(self)(self)
+
     def __dir__(self):
         return dir({}) + list(self.keys())
 
