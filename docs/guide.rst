@@ -553,8 +553,8 @@ When processed and formatted as JSON::
 
     > figura_print sample_0910_hidden
     {
-      "random_greeting": "Hello, World!", 
-      "my_public_greeting": "hey"
+      "my_public_greeting": "hey", 
+      "random_greeting": "Hello, World!"
     }
 
 
