@@ -12,12 +12,8 @@ import errno
 from figura import read_config
 from figura.errors import ConfigParsingError
 from figura.settings import get_setting, set_setting
-from figura.settings import set_extension_fig as _setfig
 
 ################################################################################
-
-# Tests use ".fig" extension. Enable it:
-_setfig()
 
 TEMPDIR_NAME = 'figura_%s' % os.getpid()
 TEMPDIR = os.path.join(tempfile.gettempdir(), TEMPDIR_NAME)

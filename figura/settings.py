@@ -8,8 +8,7 @@ from .misc import Struct
 ################################################################################
 # Defaults
 
-DEFAULT_CONFIG_FILE_EXT = 'py'  # This is currently the default, in V1
-# DEFAULT_CONFIG_FILE_EXT = 'fig'  # This will be enabled in V2.0 -- see set_extension_fig()
+DEFAULT_CONFIG_FILE_EXT = 'fig'
 
 ################################################################################
 # The SETTINGS
@@ -35,13 +34,9 @@ def get_setting(key, *default):
 
 def set_extension_fig():
     """
-    Use this for forward-compatibility.  This enables the ".fig" extension
-    (which will be the default in V2) while using Figura V1.
-
-    Use like::
-
-        from figura.settings import set_extension_fig; set_extension_fig()
-
+    This function is only provided for backward compatibility, and is a no-op
+    unless the default config-file extension has already been overridden (e.g.
+    by setting the `FIGURA_CONFIG_FILE_EXT` env var).
     """
     return set_setting('CONFIG_FILE_EXT', 'fig')
 

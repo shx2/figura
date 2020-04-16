@@ -32,7 +32,7 @@ Installation
 Install the `python package <figura.html>`_ using ``pip``::
 
     % pip install figura
-    
+
 This also installs the ``figura_print`` executable script for parsing Figura configuration files.
 
 Hello World!
@@ -51,7 +51,7 @@ After parsing it, the raw config (in JSON form) looks like this::
     % figura_print figura.hello_world
     {
       "greeting": {
-        "greetee": "World", 
+        "greetee": "World",
         "format": "Hello, %s!"
       }
     }
@@ -81,13 +81,10 @@ to make the modules python-importable.
 File Extension
 ---------------------
 
-In Figura V1.x.x, we use by defualt the standard python ".py" file extension for Figura
-config files.  In V1.1.0 support was added for using other file extensions, in order to
-distinguish python scripts and modules from Figura config files.
+Since version 2, the default extension of figura config files is ".fig".
 
-In Figura version 2 (not yet released) the default extension will be ".fig".  Users using
-Figura version>=1.1.0 are encouraged to use Figura in a forward-compatible way, by switching
-the extension explicitly to ".fig". This is done by running::
+Users using Figura version>=1.1.0 are encouraged to use Figura in a forward-compatible way,
+by setting the extension explicitly to ".fig". This is done by running::
 
     # Run this once, before reading any figura files:
     from figura.settings import set_extension_fig; set_extension_fig()

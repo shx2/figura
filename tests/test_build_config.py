@@ -4,12 +4,6 @@ Unit-tests of the high-level config reading/building functionality.
 
 import unittest
 from figura import read_config
-from figura.settings import set_extension_fig as _setfig
-
-################################################################################
-
-# Tests use ".fig" extension. Enable it:
-_setfig()
 
 
 ################################################################################

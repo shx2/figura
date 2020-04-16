@@ -4,12 +4,6 @@ Unit-tests of the __entry_point__ directive.
 
 import unittest
 from figura import read_config
-from figura.settings import set_extension_fig as _setfig
-
-################################################################################
-
-# Tests use ".fig" extension. Enable it:
-_setfig()
 
 
 ################################################################################
