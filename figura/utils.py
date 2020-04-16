@@ -9,47 +9,49 @@ from .container import ConfigContainer
 from .parser import ConfigParser
 from .importutils import walk_packages, is_importable_path, figura_implocked
 
+
 ################################################################################
 # convenience functions
 
 @figura_implocked
-def read_config(path, enable_path_spliting = True):
+def read_config(path, enable_path_spliting=True):
     """
     Flexibly read/process a Figura config file.
-    
+
     The path can point to:
-    
+
     - a config file. E.g. ``figura.tests.config.basic1``
     - a config directory. E.g. ``figura.tests.config``
     - a value (or section) inside a config. E.g. ``figura.tests.config.basic1.some_params.a``
-    
+
     :param path: a string or a `FiguraPath <#figura.path.FiguraPath>`_.
     :param enable_path_spliting: set to False if the path points to a file (as opposed to
         PATH.TO.FILE.PATH.TO.ATTR), if you want to suppress auto-splitting.
     :return: a `ConfigContainer <#figura.container.ConfigContainer>`_.
         In case of a deep path, the return value is the value from inside the
         conainer, which is not necessarilly a ConfigContainer.
-        
-    .. testsetup:: 
+
+    .. testsetup::
 
         from figura.utils import read_config
-        
+
     >>> read_config('figura.tests.config.basic1').some_params.a  # read a config file
     1
-    >>> read_config('figura.tests.config.basic1.some_params.a')  # read a value inside a config file
+    >>> read_config('figura.tests.config.basic1.some_params.a')  # read a value inside a config
     1
-    >>> read_config('figura.tests.config').basic1.some_params.a  # read a directory of config files
+    >>> read_config('figura.tests.config').basic1.some_params.a  # read a dir of config files
     1
     """
-    
+
     # process the pass, split into file-path and attr-path
     file_path, attr_path = to_figura_path(path).split_parts()
     if not file_path:
         raise ConfigParsingError('No config file found for path: %r' % str(path))
     if not enable_path_spliting and attr_path:
-        raise ConfigParsingError('No config file found for path: %r. In-file attributes detected: %s' % (
-            str(path), attr_path))
-    
+        raise ConfigParsingError(
+            'No config file found for path: %r. In-file attributes detected: %s' % (
+                str(path), attr_path))
+
     # parse the path:
     parser = ConfigParser()
     config = parser.parse(file_path)
@@ -58,12 +60,12 @@ def read_config(path, enable_path_spliting = True):
     # reflecting the structure:
     fig_ext = get_setting('CONFIG_FILE_EXT')
     for importer, rel_mod_path, ispkg in walk_packages(file_path):
-        mod_path = '%s.%s' % ( file_path, rel_mod_path )
-        if not ispkg and not is_importable_path(mod_path, with_ext = fig_ext):
+        mod_path = '%s.%s' % (file_path, rel_mod_path)
+        if not ispkg and not is_importable_path(mod_path, with_ext=fig_ext):
             continue
         cur_config = parser.parse(mod_path)
         config.deep_setattr(rel_mod_path, cur_config)
-    
+
     # apply the attr-path:
     if attr_path:
         config = config.deep_getattr(attr_path)
@@ -76,7 +78,7 @@ def build_config(*paths, **kwargs):
     """
     Build a configuration by reading Figura configs and optional
     override sets, and combining them into a final configuration.
-    
+
     `read_config <#figura.utils.read_config>`_ is called for processing each path.
 
     :param paths: paths (strings or FiguraPaths) to config files. All but the first are
@@ -99,15 +101,15 @@ def build_config(*paths, **kwargs):
     enforce_override_set = kwargs.pop('enforce_override_set', True)
     if kwargs:
         raise TypeError('build_config() got an invalid keyword argument: %s' % list(kwargs)[0])
-    
-    configs = [ _to_config(conf) for conf in paths ]
-    
+
+    configs = [_to_config(conf) for conf in paths]
+
     # using the default_config if the first config passed is an overrideset
     use_default = (len(configs) == 0) or \
         (isinstance(configs[0], ConfigContainer) and configs[0].get_metadata().is_override_set)
     if default_config is not None and use_default:
-        configs = [ _to_config(default_config) ] + configs
-    
+        configs = [_to_config(default_config)] + configs
+
     # read each config and combine them:
     is_first = True
     config = ConfigContainer()
@@ -120,15 +122,17 @@ def build_config(*paths, **kwargs):
             is_first = False
         else:
             # This is an override set to apply to the config
-            config.apply_overrides(cur_config, enforce_override_set = enforce_override_set)
+            config.apply_overrides(cur_config, enforce_override_set=enforce_override_set)
     if extra_overrides:
-        config.apply_overrides(extra_overrides, enforce_override_set = enforce_override_set)
+        config.apply_overrides(extra_overrides, enforce_override_set=enforce_override_set)
     return config
+
 
 def _to_config(x):
     if isinstance(x, ConfigContainer):
         return x
     else:
         return read_config(x)
+
 
 ################################################################################

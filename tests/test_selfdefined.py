@@ -8,57 +8,57 @@ import copy
 import unittest
 
 from figura import read_config, ConfigContainer
+from figura.settings import set_extension_fig as _setfig
 
 ################################################################################
 
 UNITTEST_FILE_PATH_PREFIX = 'figura.tests.config.'
 
 # Tests use ".fig" extension. Enable it:
-from figura.settings import set_extension_fig as _setfig
 _setfig()
+
 
 ################################################################################
 
 class BasicTest(unittest.TestCase):
-    
+
     # make sure assertion messages include both the default message, and the
     # specialized message we pass along.
     longMessage = True
-    
-    #===================================================================================================================
+
+    # ============================================================================================
+    # ============================================================================================
     # utility functions
-    #===================================================================================================================
-    
-    def assertConfigEqual(self, config1, config2, testname, key = 'ROOT'):
-        #print(config1)
+    # ============================================================================================
+
+    def assertConfigEqual(self, config1, config2, testname, key='ROOT'):
         if isinstance(config1, ConfigContainer) and isinstance(config2, ConfigContainer):
             self.assertSetEqual(
                 set(config1.keys()), set(config2.keys()),
-                msg = '[{%s} set of params at key=%s]' % (testname, key)
+                msg='[{%s} set of params at key=%s]' % (testname, key)
             )
             # recursively apply to sub containers
             for k in config1.keys():
                 subkey = '%s.%s' % (key, k) if key else k
-                self.assertConfigEqual(config1[k], config2[k], testname, key = subkey)
+                self.assertConfigEqual(config1[k], config2[k], testname, key=subkey)
         else:
             self.assertEqual(config1, config2, '[{%s} value of param at key=%s]' % (testname, key))
-    
-    #===================================================================================================================
+
+    # ============================================================================================
     # The main functions running the self-contained tests
-    #===================================================================================================================
-    
+    # ============================================================================================
+
     def run_self_contained(self, path):
         # parse the figura file
         tests, data = self.parse(path)
         assert tests
         # run each test:
         for test in tests:
-            #print('RUNNING %s / %s' % (path, test.name))
             self.run_single_test(test, data)
 
     def run_single_test(self, test, data):
         data = copy.deepcopy(data)
-        
+
         # construct
         test_input = data
         entry_point = test.construct.get('entry_point')
@@ -66,11 +66,11 @@ class BasicTest(unittest.TestCase):
             test_input = test_input.deep_getattr(entry_point)
         for base_path, ov_path in test.construct.get('apply_overrides', []):
             data.deep_getattr(base_path).apply_overrides(data.deep_getattr(ov_path))
-        
+
         # verify
         test_output = data.deep_getattr(test.verify.entry_point)
         self.assertConfigEqual(test_input, test_output, test.name)
-        
+
         # sanity: verify output is json-serializable
         test_output.to_json()
 
@@ -85,19 +85,20 @@ class BasicTest(unittest.TestCase):
                 tests.append(v)
                 data.pop(k)
         return tests, data
-        
-    
-    #===================================================================================================================
+
+    # ============================================================================================
     # A test method per self-contained unittest
-    #===================================================================================================================
-    
+    # ============================================================================================
+
     def test_basic1(self):
         return self.run_self_contained('basic1')
+
     def test_overlay(self):
         return self.run_self_contained('overlay')
+
     def test_override(self):
         return self.run_self_contained('override')
-    
+
 
 ################################################################################
 

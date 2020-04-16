@@ -4,12 +4,13 @@ Unit-tests of the __entry_point__ directive.
 
 import unittest
 from figura import read_config
+from figura.settings import set_extension_fig as _setfig
 
 ################################################################################
 
 # Tests use ".fig" extension. Enable it:
-from figura.settings import set_extension_fig as _setfig
 _setfig()
+
 
 ################################################################################
 
@@ -26,6 +27,7 @@ class BasicTest(unittest.TestCase):
     def test_entry_point_by_explicity_definition(self):
         c = read_config('figura.tests.config.entry3')
         self.assertEqual(2, c.b)
+
 
 ################################################################################
 

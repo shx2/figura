@@ -4,25 +4,26 @@ Unit-tests of the high-level config reading/building functionality.
 
 import unittest
 from figura import read_config
+from figura.settings import set_extension_fig as _setfig
 
 ################################################################################
 
 # Tests use ".fig" extension. Enable it:
-from figura.settings import set_extension_fig as _setfig
 _setfig()
+
 
 ################################################################################
 
 class BasicTest(unittest.TestCase):
 
-    #===================================================================================================================
+    # ============================================================================================
     # read_config
-    #===================================================================================================================
+    # ============================================================================================
 
     def test_read_config(self):
         c = read_config('figura.tests.config.basic1')
         self.assertEqual(2, c.some_params.b)
-    
+
     def test_read_config_directory(self):
         c = read_config('figura.tests.config')
         self.assertEqual(2, c.basic1.some_params.b)
@@ -32,12 +33,12 @@ class BasicTest(unittest.TestCase):
         c = read_config('figura.tests.config.basic1.some_params')
         self.assertEqual(2, c.b)
 
-    #===================================================================================================================
+    # ============================================================================================
     # build_config
-    #===================================================================================================================
-    
-    # Tests to be added
-    
+    # ============================================================================================
+
+    # TBD Tests to be added
+
 
 ################################################################################
 

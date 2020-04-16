@@ -2,6 +2,7 @@
 Definition of the config-related exception types.
 """
 
+
 ################################################################################
 # Exception types
 
@@ -11,11 +12,13 @@ class ConfigError(Exception):
     """
     pass
 
+
 class ConfigParsingError(ConfigError):
     """
     Exception raised when configuration parsing fails
     """
     pass
+
 
 class ConfigValueError(ConfigError):
     """
