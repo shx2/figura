@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 """
 Read a Figura config file, and print the config in JSON format.
 

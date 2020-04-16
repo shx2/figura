@@ -3,7 +3,6 @@ Parsing Figura config files.
 """
 
 import inspect
-import six
 
 from .misc import merge_dicts
 from .errors import ConfigParsingError
@@ -18,17 +17,6 @@ from .importutils import import_figura_file
 VALID_ATOMIC_VALUE_TYPES = set([type(None), type(''), type(u''), type(True), type(0), type(0.0)])
 VALID_SEQUENCE_VALUE_TYPES = set([type(()), type([]), type({})])
 
-
-def _add_type_of_exp(exp):
-    try:
-        VALID_ATOMIC_VALUE_TYPES.add(type(eval(exp)))
-    except SyntaxError:
-        pass
-
-
-# in python2, also allow long:
-_add_type_of_exp('0L')  # long
-
 META_MAP = {
     '__override__': 'is_override_set',
     '__opaque__': 'is_opaque',
@@ -40,7 +28,7 @@ META_MAP = {
 ################################################################################
 # The parser
 
-class ConfigParser(object):
+class ConfigParser:
     """
     A python-config parser. Use like::
 
@@ -263,12 +251,13 @@ class ConfigParser(object):
     def _find_entry_point(self, attrs):
         entry_point = attrs.get('__entry_point__')
         if entry_point is not None:
-            if isinstance(entry_point, six.string_types):
+            if isinstance(entry_point, str):
                 # entry_point is given by name
                 try:
                     entry_point = attrs[entry_point]
                 except KeyError:
-                    raise ConfigParsingError('entry-point not found: %s' % (entry_point, ))
+                    raise ConfigParsingError(
+                        'entry-point not found: %s' % (entry_point, )) from None
             else:
                 # entry_point is given by pointing to to a container
                 pass

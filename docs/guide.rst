@@ -42,8 +42,8 @@ When processed and formatted as JSON::
 
     > figura_print sample_0020_basic
     {
-      "display_font": "arial", 
-      "display_color": "green", 
+      "display_font": "arial",
+      "display_color": "green",
       "greeting": "Hello, World!"
     }
 
@@ -81,17 +81,17 @@ When processed and formatted as JSON::
     > figura_print sample_0030_containers
     {
       "params1": {
-        "a": 1, 
+        "a": 1,
         "b": "two"
-      }, 
+      },
       "params2": {
-        "x": 111, 
+        "x": 111,
         "nested_params": {
-          "y": 555, 
-          "z": 999, 
           "deeply_nested_params": {
             "z": 0
-          }
+          },
+          "y": 555,
+          "z": 999
         }
       }
     }
@@ -129,19 +129,19 @@ When processed and formatted as JSON::
 
     > figura_print sample_0040_reusing
     {
-      "ftp_connetion": {
-        "host": "localhost", 
-        "port": 21
-      }, 
-      "http_connection": {
-        "host": "localhost", 
-        "port": 80
-      }, 
       "client": {
         "connection": {
-          "host": "localhost", 
-          "port": 80
+          "port": 80,
+          "host": "localhost"
         }
+      },
+      "ftp_connetion": {
+        "port": 21,
+        "host": "localhost"
+      },
+      "http_connection": {
+        "port": 80,
+        "host": "localhost"
       }
     }
 
@@ -171,11 +171,11 @@ When processed and formatted as JSON::
 
     > figura_print sample_0050_importing
     {
+      "greeting": "Hello, World!",
       "my_favorites": {
-        "color": "green", 
+        "color": "green",
         "greeting": "Hello, World!"
-      }, 
-      "greeting": "Hello, World!"
+      }
     }
 
 You can make use of all the nice features of Python's import mechanism, e.g. relative imports, ``from mod import *``, etc.
@@ -212,14 +212,14 @@ When processed and formatted as JSON::
 
     > figura_print sample_0060_extending
     {
-      "analysis_debug_logging": {
-        "engine": "debug", 
-        "traffic": "warning", 
-        "analyzer": "debug"
-      }, 
       "debug_logging": {
-        "engine": "debug", 
+        "engine": "debug",
         "traffic": "debug"
+      },
+      "analysis_debug_logging": {
+        "engine": "debug",
+        "traffic": "warning",
+        "analyzer": "debug"
       }
     }
 
@@ -274,16 +274,16 @@ When processed and formatted as JSON::
 
     > figura_print sample_0070_overlaying
     {
-      "a": {
-        "b": {
-          "y": 2, 
-          "x": 1
-        }
-      }, 
       "a2": {
         "b": {
-          "y": 3, 
-          "x": 1
+          "x": 1,
+          "y": 3
+        }
+      },
+      "a": {
+        "b": {
+          "x": 1,
+          "y": 2
         }
       }
     }
@@ -314,15 +314,15 @@ When processed and formatted as JSON::
 
     > figura_print sample_0075_opaque
     {
-      "a": {
-        "b": {
-          "y": 2, 
-          "x": 1
-        }
-      }, 
       "a2": {
         "b": {
           "y": 3
+        }
+      },
+      "a": {
+        "b": {
+          "x": 1,
+          "y": 2
         }
       }
     }
@@ -359,12 +359,12 @@ When applied to ``sample_0050_importing``::
 
     > figura_print sample_0050_importing sample_0080_overrides
     {
+      "greeting": "Hello, World!",
       "my_favorites": {
-        "color": "red", 
-        "pet": "dog", 
-        "greeting": "Hello, World!"
-      }, 
-      "greeting": "Hello, World!"
+        "pet": "dog",
+        "greeting": "Hello, World!",
+        "color": "red"
+      }
     }
 
 :note: When given multiple arguments, ``figura_print`` interprets all arguments which come after the first
@@ -397,11 +397,11 @@ When applied to ``sample_0050_importing``, ``my_favorites.greeting`` is excluded
 
     > figura_print sample_0050_importing sample_0083_opaqueoverrides
     {
+      "greeting": "Hello, World!",
       "my_favorites": {
-        "color": "red", 
+        "color": "red",
         "pet": "dog"
-      }, 
-      "greeting": "Hello, World!"
+      }
     }
 
 :note: ``figura_print`` supports taking ``--override`` cli option, which demostrate how flat override sets are useful.
@@ -429,19 +429,19 @@ An example of applying overrides, passed from command line, to ``sample_0030_con
 
     > figura_print sample_0030_containers --override params2.x=A_NEW_VALUE1 --override params2.nested_params.z=A_NEW_VALUE2
     {
-      "params1": {
-        "a": 1, 
-        "b": "two"
-      }, 
       "params2": {
-        "x": "A_NEW_VALUE1", 
+        "x": "A_NEW_VALUE1",
         "nested_params": {
-          "y": 555, 
-          "z": "A_NEW_VALUE2", 
+          "z": "A_NEW_VALUE2",
+          "y": 555,
           "deeply_nested_params": {
             "z": 0
           }
         }
+      },
+      "params1": {
+        "a": 1,
+        "b": "two"
       }
     }
 
@@ -477,11 +477,11 @@ Here we access a nested container::
 
     > figura_print sample_0030_containers.params2.nested_params
     {
-      "y": 555, 
-      "z": 999, 
+      "z": 999,
       "deeply_nested_params": {
         "z": 0
-      }
+      },
+      "y": 555
     }
 
 It also works with a "leaf" value::
@@ -553,7 +553,7 @@ When processed and formatted as JSON::
 
     > figura_print sample_0910_hidden
     {
-      "my_public_greeting": "hey", 
+      "my_public_greeting": "hey",
       "random_greeting": "Hello, World!"
     }
 
@@ -599,14 +599,14 @@ When processed and formatted as JSON::
 
     > figura_print sample_0930_arithmetics
     {
-      "A": {
-        "polling_interval": 300
-      }, 
-      "C": {
-        "polling_interval": 2400
-      }, 
       "B": {
         "polling_interval": 600
+      },
+      "A": {
+        "polling_interval": 300
+      },
+      "C": {
+        "polling_interval": 2400
       }
     }
 

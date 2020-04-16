@@ -4,18 +4,12 @@ and inspecting packages containing them.
 """
 
 import sys
-import six
 import functools
 import imp
 import importlib
 import pkgutil
 import figura.polyloader as polyloader  # TODO: figura.polyloader -> polyloader
-try:
-    # py3
-    from importlib.util import find_spec as _find_module
-except ImportError:
-    # py2
-    from pkgutil import find_loader as _find_module
+from importlib.util import find_spec as _find_module
 
 from .settings import get_setting
 from .errors import ConfigParsingError
@@ -23,7 +17,7 @@ from .errors import ConfigParsingError
 
 ################################################################################
 
-class _NoImportSideEffectsContext(object):
+class _NoImportSideEffectsContext:
 
     def __init__(self, cleanup_import_caches=True):
         self.cleanup_import_caches = cleanup_import_caches
@@ -70,7 +64,7 @@ class _NoImportSideEffectsContext(object):
 class _FiguraImportContext(_NoImportSideEffectsContext):
 
     def __enter__(self):
-        super(_FiguraImportContext, self).__enter__()
+        super().__enter__()
         self.should_uninstall = False
         fig_ext = get_setting('CONFIG_FILE_EXT')
         if fig_ext != '.py' and not polyloader.is_installed(fig_ext):
@@ -81,10 +75,10 @@ class _FiguraImportContext(_NoImportSideEffectsContext):
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.should_uninstall:
             polyloader.uninstall(self.fig_ext)
-        super(_FiguraImportContext, self).__exit__(exc_type, exc_val, exc_tb)
+        super().__exit__(exc_type, exc_val, exc_tb)
 
 
-class _ImpLock(object):
+class _ImpLock:
 
     def acquire(self):
         imp.acquire_lock()
@@ -145,14 +139,7 @@ def _raw_import(path):
     # See:
     # https://docs.python.org/3/library/importlib.html#importlib.import_module
     # https://docs.python.org/3/library/importlib.html#importlib.invalidate_caches
-    try:
-        invalidate_caches = importlib.invalidate_caches
-    except AttributeError:
-        # python2
-        pass
-    else:
-        # python3
-        invalidate_caches()
+    importlib.invalidate_caches()
     # Now can safely import the module
     return importlib.import_module(path)
 
@@ -169,16 +156,7 @@ def import_figura_file(path):
     try:
         return _import_module_no_side_effects(path)
     except Exception as e:
-        if six.PY2:
-            # no exception chaining in python2
-            raise ConfigParsingError('Failed parsing config "%s": %r' % (path, e))
-            # This is not a valid py3 syntax:
-            # raise ConfigParsingError('Failed parsing "%s": %r' % (path, e)), \
-            #   None, sys.exc_info()[2]
-        else:
-            six.raise_from(ConfigParsingError('Failed parsing config "%s"' % path), e)
-            # This is not a valid py3 syntax:
-            # raise ConfigParsingError('Failed parsing config "%s"' % path) from e
+        raise ConfigParsingError('Failed parsing config "%s"' % path) from e
 
 
 @figura_implocked
@@ -195,16 +173,7 @@ def is_importable_path(path, with_ext=None):
     if module_spec is None:
         return False
     if with_ext is not None:
-        try:
-            # py3
-            filepath = module_spec.origin
-        except AttributeError:
-            try:
-                # py2
-                filepath = module_spec.get_filename()
-            except AttributeError:
-                # py2, but with polyloader
-                filepath = module_spec.path
+        filepath = module_spec.origin
         if not filepath.endswith('.' + with_ext):
             return False
     return True

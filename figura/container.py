@@ -9,7 +9,7 @@ from .misc import Struct, merge_dicts, deep_getattr, deep_setattr
 
 ################################################################################
 
-class ConfigContainerMixin():
+class ConfigContainerMixin:
     """
     A mixin-baseclass of the `ConfigContainer <#figura.container.ConfigContainer>`_ class.
     """
@@ -68,7 +68,7 @@ class ConfigContainerMixin():
     def __repr__(self):
         return '%s(%s)' % (
             self.__class__.__name__,
-            super(ConfigContainer, self).__repr__())
+            super().__repr__())
 
     def to_json(self, **kwargs):
         """
@@ -135,7 +135,7 @@ class ConfigContainer(Struct, ConfigContainerMixin):
 
     def __init__(self, *args, **kwargs):
         metadata = kwargs.pop('metadata', None)
-        super(ConfigContainer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # not doing self._metadata=x because that results with self['_metadata']=x,
         # i.e. adding a new key to the container
         if metadata is not None:

@@ -16,7 +16,7 @@ class ConfigOverrideSet(ConfigContainer):
     """
 
     def __init__(self, *args, **kwargs):
-        super(ConfigOverrideSet, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.get_metadata().is_override_set = True
 
 

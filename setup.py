@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from setuptools import setup, find_packages
 from codecs import open
@@ -29,9 +29,7 @@ setup(
 
     packages=find_packages(exclude=['tests*', 'figura.tests*']),
     platforms = ["POSIX", "Windows"],
-    install_requires=[
-        'six',
-    ],
+    install_requires=[],
     entry_points={
         'console_scripts': [
             'figura_print=figura.tools.figura_print:main',
@@ -44,9 +42,6 @@ setup(
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Code Generators',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',

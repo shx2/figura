@@ -8,7 +8,7 @@ from .importutils import is_importable_path
 
 ################################################################################
 
-class FiguraPath(object):
+class FiguraPath:
     """
     A path to a Figura config file, or a value within one.
     The path contains two (optional) parts: the file-path, which is a python-import

@@ -42,7 +42,6 @@ Another example, leveraging `build_config <#figura.cli.build_config_from_cli>`__
 """
 
 import argparse
-import six
 
 from .container import ConfigContainer
 from .utils import build_config
@@ -249,12 +248,12 @@ def boolify(x):
     False
 
     """
-    if isinstance(x, six.string_types):
+    if isinstance(x, str):
         x = x.lower()
     try:
         return _BOOLIFY_DICT[x]
-    except KeyError:
-        raise ValueError('Can\'t boolify value: %r' % x)
+    except KeyError as e:
+        raise ValueError('Can\'t boolify value: %r' % x) from None
 
 
 ################################################################################

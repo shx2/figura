@@ -50,9 +50,9 @@ class BasicTest(unittest.TestCase):
         assert tests
         # run each test:
         for test in tests:
-            self.run_single_test(test, data)
+            self._run_single_test(test, data)
 
-    def run_single_test(self, test, data):
+    def _run_single_test(self, test, data):
         data = copy.deepcopy(data)
 
         # construct
