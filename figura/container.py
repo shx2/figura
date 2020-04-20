@@ -131,6 +131,9 @@ class ConfigContainer(Struct, ConfigContainerMixin):
         is_opaque=False,
         is_opaque_override=False,
         doc=None,
+        name=None,
+        file=None,
+        package=None,
     )
 
     def __init__(self, *args, **kwargs):
@@ -149,6 +152,37 @@ class ConfigContainer(Struct, ConfigContainerMixin):
 
     def copy(self):
         return type(self)(self)
+
+    @property
+    def __doc__(self):
+        return self._metadata.doc
+
+    @property
+    def __name__(self):
+        return self._metadata.name
+
+    @property
+    def __file__(self):
+        return self._metadata.file
+
+    @property
+    def __package__(self):
+        return self._metadata.package
+
+    def _add_module_metadata(self, module):
+        metadata = self._metadata
+        for attr in ['name', 'file', 'package']:
+            try:
+                metadata[attr] = getattr(module, '__%s__' % attr)
+            except AttributeError:
+                pass
+        for attr in ['doc']:
+            if metadata[attr]:
+                continue
+            try:
+                metadata[attr] = getattr(module, '__%s__' % attr)
+            except AttributeError:
+                pass
 
 
 ################################################################################

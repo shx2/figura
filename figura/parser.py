@@ -30,11 +30,16 @@ META_MAP = {
 
 class ConfigParser:
     """
-    A python-config parser. Use like::
+    A python-config parser.
 
-        from figura.parser import ConfigParser
+    Should not be used directly, use ``read_config`` instead.  If used directly,
+    the ``parse`` method should be called from within a ``FiguraImportContext`` context.
+
+    Use like::
+
         parser = ConfigParser()
-        config = parser.parse('figura.tests.config.basic1')
+        with FiguraImportContext():
+            config = parser.parse('figura.tests.config.basic1')
 
     """
 
@@ -64,10 +69,15 @@ class ConfigParser:
         """
 
         # load it using python's import mechanism:
-        x = self._import_python_module(path)
+        module = self.get_module(path)
         # post-import processing:
-        conf = self._python_to_conf(x)
+        conf = self._python_to_conf(module)
+        # post-parsing:
+        self._finalize_config_container(conf, module)
         return conf
+
+    def get_module(self, path):
+        return self._import_python_module(path)
 
     # ============================================================================================
     # python-import harnessing
@@ -194,6 +204,9 @@ class ConfigParser:
             k = normalize_override_key(k)
             real_attrs[k] = v
         return real_attrs, meta_attrs
+
+    def _finalize_config_container(self, conf, module):
+        conf._add_module_metadata(module)
 
     # ============================================================================================
     # overlay support
