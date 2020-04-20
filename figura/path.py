@@ -16,11 +16,15 @@ class FiguraPath:
     value inside the file.
 
     The two parts are concatenated together with the same delimiter used by each
-    of the parts, thus one cannot immediately tell
+    of the parts, thus one cannot immediately tell where the first part ends and
+    the other begins.
 
     E.g.: a path representing "the value of ``A.B.b`` inside the config file
     ``figura.tests.config.override``,
     is written like: ``figura.tests.config.override.A.B.b``.
+
+    :note: using this class invokes the python-importing mechanism, and thus causes
+        side-effects.  To be safe, it should be used from inside a ``FiguraImportContext``.
     """
 
     DELIM = '.'
@@ -61,9 +65,13 @@ class FiguraPath:
         .. testsetup::
 
             from figura.path import FiguraPath
+            from figura.importutils import FiguraImportContext
 
-        >>> FiguraPath('figura.hello_world.greeting.greetee').split_parts()
-        ('figura.hello_world', 'greeting.greetee')
+        .. doctest::
+
+            >>> with FiguraImportContext():
+            ...     FiguraPath('figura.hello_world.greeting.greetee').split_parts()
+            ('figura.hello_world', 'greeting.greetee_ZXXXX')
         """
         tokens = self._path.split(self.DELIM)
         n = len(tokens)

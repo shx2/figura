@@ -34,11 +34,11 @@ class test_nesting_in_container:
 class some_params:
     a = 1
     b = 2
-    
+
     # starting with underscore meaning private, i.e. not included in the ConfigContainer.
     _c_hidden = [3,4]
     c = _c_hidden
-    
+
     class nested:
         d = 'five'
 

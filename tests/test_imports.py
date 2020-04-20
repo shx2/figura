@@ -118,15 +118,15 @@ class BasicTest(unittest.TestCase):
         # read_config -- get the fig file
         self.assertEqual(read_config(path).filetype, 'fig')
         # import -- get the py file
-        import tests.config.samename
-        self.assertEqual(tests.config.samename.filetype, 'py')
+        import tests.config.samename as M
+        self.assertEqual(M.filetype, 'py')
 
     def test_same_name_import_vs_config2(self):
         # same as test_same_name_import_vs_config1, but order is reversed
         path = '%s.samename' % BASE_IMPORT_PATH
         # import -- get the py file
-        import tests.config.samename
-        self.assertEqual(tests.config.samename.filetype, 'py')
+        import tests.config.samename as M
+        self.assertEqual(M.filetype, 'py')
         # read_config -- get the fig file
         self.assertEqual(read_config(path).filetype, 'fig')
 
