@@ -114,7 +114,7 @@ class FiguraImportContext(_SysModuleRestoringContext):
 
     def _disable_write_bytecode(self):
         self.prev_dont_write_bytecode = sys.dont_write_bytecode
-        sys.dont_write_bytecode = False
+        sys.dont_write_bytecode = True
 
     def _restore_write_bytecode(self):
         sys.dont_write_bytecode = self.prev_dont_write_bytecode
