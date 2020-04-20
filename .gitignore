@@ -3,4 +3,5 @@ __pycache__
 docs/_build
 dist
 build
+.tox
 figura.egg-info/

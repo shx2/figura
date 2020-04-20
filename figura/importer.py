@@ -7,7 +7,19 @@ This module includes tools for enabling and disabling imoprting files with custo
 
 import sys
 import importlib
+import importlib.machinery
 import imp
+
+
+################################################################################
+# python version compatibility
+
+FileFinder = importlib.machinery.FileFinder
+SourceFileLoader = importlib.machinery.SourceFileLoader
+try:
+    _get_supported_file_loaders = importlib._bootstrap_external._get_supported_file_loaders
+except AttributeError:
+    _get_supported_file_loaders = importlib._bootstrap._get_supported_file_loaders
 
 
 ################################################################################
@@ -79,11 +91,10 @@ def _refresh_hooks():
 
     # reconstruct the FileFinder path hook, but this time adding our loader+suffixes.
     # our importer is added first, to take precedence over standard suffixes (".py", etc.)
-    figura_loader = (importlib.machinery.SourceFileLoader, list(_INSTALLED_SUFFIXES))
-    orig_loaders = importlib._bootstrap_external._get_supported_file_loaders()
+    figura_loader = (SourceFileLoader, list(_INSTALLED_SUFFIXES))
+    orig_loaders = _get_supported_file_loaders()
 
     # replace FileFinder hook with the new one:
-    FileFinder = importlib.machinery.FileFinder
     hooks[pos] = FileFinder.path_hook(figura_loader, *orig_loaders)
 
     _clear_caches()
