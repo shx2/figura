@@ -38,6 +38,8 @@ class BasicTest(unittest.TestCase):
             fig_ext = get_setting('CONFIG_FILE_EXT')
             with open(os.path.join(dir, '__init__.%s' % fig_ext), 'w'):
                 pass
+            # just in case, clear importlib caches
+            sys.path_importer_cache.pop(dir, None)
 
     def tearDown(self):
         # delete temp dir

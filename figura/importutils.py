@@ -8,8 +8,6 @@ import copy
 import functools
 import importlib
 from importlib.util import find_spec as _find_spec
-from importlib.abc import FileLoader
-from importlib.machinery import SourceFileLoader
 
 from .importer import (
     install_figura_importer, uninstall_figura_importer, is_installed_figura_importer,
@@ -58,7 +56,6 @@ class FiguraImportContext(_SysModuleRestoringContext):
       (disable on exit)
     - modules imported (directly and indirectly) are not added to ``sys.modules``
       (implemented in baseclass)
-    - clears importlib caches, to make sure config files are detected by the import mechanism
     - cache files (``*.pyc``) are not created
 
     Nesting a ``FiguraImportContext`` inside another is supported, but will incur unnecessary
@@ -68,23 +65,8 @@ class FiguraImportContext(_SysModuleRestoringContext):
     def __enter__(self):
         super().__enter__()
 
-        # First, invalidate caches!
-        # From the docs:
-        # "If you are dynamically importing a module that was created since the interpreter began
-        # execution (e.g., created a Python source file), you may need to call invalidate_caches()
-        # in order for the new module to be noticed by the import system."
-        # Since we're dealing with config files, we need to support re-reading config files
-        # which are modified after the interpreter started.
-        # See:
-        # https://docs.python.org/3/library/importlib.html#importlib.import_module
-        # https://docs.python.org/3/library/importlib.html#importlib.invalidate_caches
-        importlib.invalidate_caches()
-
         # don't cache it:
         self._disable_write_bytecode()
-
-        # don't let already-imported py modules hide config files with the same name:
-        self._drop_file_modules()
 
         # make config files visible to import mechanism:
         self._enable_figura_importer()
@@ -118,27 +100,6 @@ class FiguraImportContext(_SysModuleRestoringContext):
 
     def _restore_write_bytecode(self):
         sys.dont_write_bytecode = self.prev_dont_write_bytecode
-
-    def _drop_file_modules(self):
-        # drop all modules which have been loaded by a FileLoader
-        to_drop = [
-            modname
-            for modname, module in self._sys_modules.items()
-            if self._is_file_module(module)
-        ]
-        for modname in to_drop:
-            sys.modules.pop(modname, None)
-
-    def _is_file_module(self, module):
-        try:
-            loader = module.__spec__.loader
-        except AttributeError:
-            return False
-        else:
-            # For speed, avoid the isinstance() call, for the vast majority of the cases
-            if type(loader) == SourceFileLoader:
-                return True
-            return isinstance(loader, FileLoader)
 
 
 def figura_importing(func):

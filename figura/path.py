@@ -71,7 +71,7 @@ class FiguraPath:
 
             >>> with FiguraImportContext():
             ...     FiguraPath('figura.hello_world.greeting.greetee').split_parts()
-            ('figura.hello_world', 'greeting.greetee_ZXXXX')
+            ('figura.hello_world', 'greeting.greetee')
         """
         tokens = self._path.split(self.DELIM)
         n = len(tokens)

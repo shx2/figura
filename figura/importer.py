@@ -10,16 +10,13 @@ import importlib
 import importlib.machinery
 import imp
 
+SourceFileLoader = importlib.machinery.SourceFileLoader
+
 
 ################################################################################
-# python version compatibility
 
-FileFinder = importlib.machinery.FileFinder
-SourceFileLoader = importlib.machinery.SourceFileLoader
-try:
-    _get_supported_file_loaders = importlib._bootstrap_external._get_supported_file_loaders
-except AttributeError:
-    _get_supported_file_loaders = importlib._bootstrap._get_supported_file_loaders
+_HOOKS_PATCHED = False
+_INSTALLED_LOADERS = []
 
 
 ################################################################################
@@ -46,20 +43,17 @@ _implock = _ImpLock()
 ################################################################################
 # install/uninstall global functions
 
-_INSTALLED_SUFFIXES = []
-
-
 def install_figura_importer(suffix):
     """
     Make files with given suffix visible to python ``import``.
     These file will take precedence over standard suffixes (".py", etc.).
     """
     with _implock:
-        if suffix in _INSTALLED_SUFFIXES:
+        _patch_hooks()
+        if is_installed_figura_importer(suffix):
             # already installed
             return
-        _INSTALLED_SUFFIXES.append(suffix)
-        _refresh_hooks()
+        _INSTALLED_LOADERS.append((suffix, SourceFileLoader))
 
 
 def uninstall_figura_importer(suffix):
@@ -67,42 +61,71 @@ def uninstall_figura_importer(suffix):
     Undo what `install_figura_importer`_ did.
     """
     with _implock:
-        try:
-            _INSTALLED_SUFFIXES.remove(suffix)
-        except KeyError:
-            # not currently installed
-            pass
+        for i, (sfx, loader) in enumerate(_INSTALLED_LOADERS):
+            if suffix == sfx:
+                break
         else:
-            _refresh_hooks()
+            # not currently installed
+            return
+        del _INSTALLED_LOADERS[i]
 
 
 def is_installed_figura_importer(suffix):
     with _implock:
-        return suffix in _INSTALLED_SUFFIXES
+        return any(suffix == sfx for (sfx, loader) in _INSTALLED_LOADERS)
 
 
-def _refresh_hooks():
-    hooks = sys.path_hooks
-    for pos, hook in enumerate(hooks):
-        if 'FileFinder' in str(hook):
+################################################################################
+# privates
+
+class _ConcatenatedSequence:
+    # we only need to defined __iter__, because finder._loaders is only used by iterating over
+
+    def __init__(self, *seqs):
+        self.seqs = seqs
+
+    def __iter__(self):
+        for seq in self.seqs:
+            yield from seq
+
+
+def _patch_finder(finder):
+    if not isinstance(getattr(finder, '_loaders', None), list):
+        return False
+    finder._loaders = _ConcatenatedSequence(_INSTALLED_LOADERS, finder._loaders)
+    return True
+
+
+def _patch_path_hook(hook):
+
+    def path_hook(*a, **kw):
+        finder = hook(*a, **kw)
+        _patch_finder(finder)
+        return finder
+
+    return path_hook
+
+
+def _patch_hooks():
+    # only runs once
+    global _HOOKS_PATCHED
+    if _HOOKS_PATCHED:
+        return
+
+    # patch hooks in sys.path_hook, so that our patched finder is created from now on:
+    for i, hook in enumerate(sys.path_hooks):
+        if 'path_hook_for_FileFinder' in str(hook):
+            patched_hook = _patch_path_hook(hook)
+            sys.path_hooks[i] = patched_hook
             break
     else:
         assert 0, 'no FileFinder found in sys.path_hooks'
 
-    # reconstruct the FileFinder path hook, but this time adding our loader+suffixes.
-    # our importer is added first, to take precedence over standard suffixes (".py", etc.)
-    figura_loader = (SourceFileLoader, list(_INSTALLED_SUFFIXES))
-    orig_loaders = _get_supported_file_loaders()
+    # patch finders already created and cached:
+    for key, finder in sys.path_importer_cache.items():
+        _patch_finder(finder)
 
-    # replace FileFinder hook with the new one:
-    hooks[pos] = FileFinder.path_hook(figura_loader, *orig_loaders)
-
-    _clear_caches()
-
-
-def _clear_caches():
-    sys.path_importer_cache.clear()
-    importlib.invalidate_caches()
+    _HOOKS_PATCHED = True
 
 
 ################################################################################
