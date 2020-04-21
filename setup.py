@@ -48,8 +48,8 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
-        "Operating System :: Microsoft :: Windows",
         "Operating System :: POSIX",
+        "Operating System :: Microsoft :: Windows",
     ],
     keywords='config, configuration, object oriented, code generation',
 
