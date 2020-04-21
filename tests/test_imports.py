@@ -34,8 +34,9 @@ class BasicTest(unittest.TestCase):
         for dir in [TEMPDIR, tempdir]:
             # create temp dir
             mkdir_p(dir)
-            # touch __init__.py
-            with open(os.path.join(dir, '__init__.py'), 'w'):
+            # touch __init__.fig
+            fig_ext = get_setting('CONFIG_FILE_EXT')
+            with open(os.path.join(dir, '__init__.%s' % fig_ext), 'w'):
                 pass
 
     def tearDown(self):
