@@ -1,3 +1,7 @@
+2.0.1
+----------------
+* removed use of deprecated library imp
+
 2.0.0
 ----------------
 * ".fig" is now the default extension of config files
