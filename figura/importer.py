@@ -8,7 +8,7 @@ This module includes tools for enabling and disabling imoprting files with custo
 import sys
 import importlib
 import importlib.machinery
-import imp
+from threading import RLock
 
 SourceFileLoader = importlib.machinery.SourceFileLoader
 
@@ -22,22 +22,22 @@ _INSTALLED_LOADERS = []
 ################################################################################
 # lock
 
-class _ImpLock:
+_figura_implock = RLock()
+
+
+class _ImpLockedContext:
 
     def acquire(self):
-        imp.acquire_lock()
+        _figura_implock.acquire()
 
     def release(self):
-        imp.release_lock()
+        _figura_implock.release()
 
     def __enter__(self):
-        self.acquire()
+        _figura_implock.__enter__()
 
     def __exit__(self, *a, **kw):
-        self.release()
-
-
-_implock = _ImpLock()
+        _figura_implock.__exit__(*a, **kw)
 
 
 ################################################################################
@@ -48,7 +48,7 @@ def install_figura_importer(suffix):
     Make files with given suffix visible to python ``import``.
     These file will take precedence over standard suffixes (".py", etc.).
     """
-    with _implock:
+    with _ImpLockedContext():
         _patch_hooks()
         if is_installed_figura_importer(suffix):
             # already installed
@@ -60,7 +60,7 @@ def uninstall_figura_importer(suffix):
     """
     Undo what `install_figura_importer`_ did.
     """
-    with _implock:
+    with _ImpLockedContext():
         for i, (sfx, loader) in enumerate(_INSTALLED_LOADERS):
             if suffix == sfx:
                 break
@@ -71,7 +71,7 @@ def uninstall_figura_importer(suffix):
 
 
 def is_installed_figura_importer(suffix):
-    with _implock:
+    with _ImpLockedContext():
         return any(suffix == sfx for (sfx, loader) in _INSTALLED_LOADERS)
 
 

@@ -11,14 +11,14 @@ from importlib.util import find_spec as _find_spec
 
 from .importer import (
     install_figura_importer, uninstall_figura_importer, is_installed_figura_importer,
-    _ImpLock)
+    _ImpLockedContext)
 from .settings import get_setting
 from .errors import ConfigParsingError
 
 
 ################################################################################
 
-class _SysModuleRestoringContext(_ImpLock):
+class _SysModuleRestoringContext(_ImpLockedContext):
     """
     A context manager which reverts any changes to ``sys.modules`` done by the enclosing block.
     """
@@ -50,7 +50,7 @@ class FiguraImportContext(_SysModuleRestoringContext):
 
     It takes care of several things:
 
-    - acquires the imp lock, for (partial) concurrency protection (releases on exit)
+    - acquires the figura-importer lock, for (partial) concurrency protection (releases on exit)
       (implemented in baseclass)
     - enables custom figura importer, for loading figura config files with the custom extension
       (disable on exit)
