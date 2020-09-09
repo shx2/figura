@@ -1,3 +1,7 @@
+2.0.2
+----------------
+* bug fixes
+
 2.0.1
 ----------------
 * removed use of deprecated library imp
