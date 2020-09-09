@@ -22,6 +22,8 @@ class BasicTest(unittest.TestCase):
         c = read_config('figura.tests.config')
         self.assertEqual(2, c.basic1.some_params.b)
         self.assertEqual('baz', c.more.xxx.foo.bar)
+        self.assertEqual(1, c.deep1.conf1.attr1)
+        self.assertEqual(2, c.deep1.deep2.conf2.attr2)
 
     def test_read_config_deep(self):
         c = read_config('figura.tests.config.basic1.some_params')

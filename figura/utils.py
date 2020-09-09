@@ -113,18 +113,20 @@ def _figura_walk_packages(pkg_module, prefix=''):
             # check if it contains configs:
             rel_mod_path = rel_filename
             full_mod_path = '%s.%s' % (base_path, rel_mod_path)
+            result_rel_mod_path = prefix + rel_mod_path
             if is_importable_path(full_mod_path, with_ext=fig_ext):
-                yield (abs_filename, rel_mod_path, True)
+                yield (abs_filename, result_rel_mod_path, True)
                 parser = ConfigParser()
                 subpkg_config = parser.parse(full_mod_path)
                 subpkg_module = _get_module_of_config_container(subpkg_config)
-                yield from _figura_walk_packages(subpkg_module, prefix=rel_mod_path + '.')
+                yield from _figura_walk_packages(subpkg_module, prefix=result_rel_mod_path + '.')
 
         elif rel_filename.endswith(suffix):
             # a config file
             rel_mod_path = rel_filename[:-len(suffix)]
             if rel_mod_path:
-                yield (abs_filename, prefix + rel_mod_path, False)
+                result_rel_mod_path = prefix + rel_mod_path
+                yield (abs_filename, result_rel_mod_path, False)
 
 
 def _get_module_of_config_container(conf):
