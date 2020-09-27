@@ -84,6 +84,29 @@ class Struct(dict):
 ################################################################################
 # attribute access tricks
 
+_BOOLEAN_VALUES = {
+    '0': False, '1': True,
+    'no': False, 'yes': True,
+    'n': False, 'y': True,
+    'false': False, 'true': True,
+    'disabled': False, 'enabled': True,
+    'off': False, 'on': True,
+}
+
+def coerce_type(original_value, new_value):
+    # don't coerce non-string values
+    if not isinstance(new_value, basestring):
+        return new_value
+
+    if isinstance(original_value, bool):
+        boolean_value = _BOOLEAN_VALUES.get(new_value.lower())
+        if boolean_value is not None:
+            return boolean_value
+    elif isinstance(original_value, (int, float)):
+        return type(original_value)(new_value)
+
+    return new_value
+
 def deep_getattr(x, attr_path, *args, **kwargs):
     """
     ``deep_getattr(x, 'a.b.c')`` -->
